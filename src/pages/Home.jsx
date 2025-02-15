@@ -1,6 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-[#B7D5E5] flex flex-col items-center justify-center w-screen">
       {/* Navigation Bar */}
@@ -25,7 +28,10 @@ const Home = () => {
       <div className="bg-white p-6 mt-6 rounded-lg shadow-lg text-center w-64">
         <p className="font-semibold text-gray-700 text-lg">Get started...</p>
         <div className="mt-4">
-          <button className="block w-full py-2 bg-gray-400 text-white rounded-lg my-2 hover:bg-blue-700 transition">
+          <button
+            onClick={() => navigate("/login")}
+            className="block w-full py-2 bg-gray-400 text-white rounded-lg my-2 hover:bg-blue-700 transition"
+          >
             Login
           </button>
           <button className="block w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-800 transition">
