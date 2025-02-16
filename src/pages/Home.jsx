@@ -34,7 +34,10 @@ const Home = () => {
           >
             Login
           </button>
-          <button className="block w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-800 transition">
+          <button
+            onClick={() => navigate("/signup")}  // ✅ Navigate to Sign-Up page
+            className="block w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-800 transition"
+          >
             Sign up
           </button>
         </div>

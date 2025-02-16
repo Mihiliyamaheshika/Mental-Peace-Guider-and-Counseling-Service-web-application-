@@ -1,14 +1,17 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <header className="w-full flex items-center justify-between bg-white shadow-md px-6 py-2 h-12">
-      {/* Logo - Right aligned */}
-      <img src="/logo.png" alt="MindPeace Logo" className="h-8 w-auto ml-auto" />
-      
-      {/* Navbar Title (you can remove this if you just want the logo) */}
-      {/* <h1 className="text-xl font-semibold text-blue-900">Mind Peace</h1> */}
-    </header>
+    <nav className="bg-gray-800 text-white p-4">
+      <div className="container mx-auto flex justify-between">
+        <Link to="/" className="text-lg font-bold">Mental Peace</Link>
+        <div>
+          <Link to="/signup" className="mr-4">Sign Up</Link>
+          <Link to="/login">Login</Link>
+        </div>
+      </div>
+    </nav>
   );
 };
 
