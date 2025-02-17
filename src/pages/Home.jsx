@@ -1,14 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#B7D5E5] flex flex-col items-center justify-center w-screen">
       {/* Navigation Bar */}
-      <header className="w-screen flex justify-between items-center h-12 bg-white shadow-md px-0">
-        <nav className="text-gray-800 text-lg font-semibold"></nav>
+      <header className="w-screen flex justify-between items-center h-12 bg-white shadow-md px-4">
+        <nav className="text-gray-800 text-lg font-semibold flex items-center space-x-6">
+          {/* Dropdown Menu */}
+          <div className="relative">
+            <button
+              className="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+            >
+              Resource Library
+            </button>
+            {dropdownOpen && (
+              <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg">
+                <ul className="py-2">
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => navigate("/lifetips")}
+                  >
+                    Life Tips
+                  </li>
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => navigate("/love")}
+                  >
+                    Love
+                  </li>
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => navigate("/child")}
+                  >
+                    Child
+                  </li>
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => navigate("/career")}
+                  >
+                    Career
+                  </li>
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => navigate("/education")}
+                  >
+                    Education
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+        </nav>
         <img src="/logo.png" alt="MindPeace Logo" className="h-20 mr-10" />
       </header>
 
@@ -35,7 +82,7 @@ const Home = () => {
             Login
           </button>
           <button
-            onClick={() => navigate("/signup")}  // ✅ Navigate to Sign-Up page
+            onClick={() => navigate("/signup")}
             className="block w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-800 transition"
           >
             Sign up
