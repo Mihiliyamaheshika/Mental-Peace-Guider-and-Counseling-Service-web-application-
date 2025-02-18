@@ -1,0 +1,32 @@
+.article-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 images per row */
+    gap: 15px;
+    padding: 20px;
+  }
+  
+  .article-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .article-image:hover {
+    transform: scale(1.05);
+  }
+  
+  .article-title {
+    text-align: center; /* Center the text */
+    font-size: 32px; /* Bigger text */
+    font-weight: bold; /* Make it bold */
+    color: #333; /* Professional dark color */
+    margin-bottom: 20px; /* Space below the title */
+    text-transform: uppercase; /* Uppercase for a professional touch */
+    letter-spacing: 1.5px; /* Spacing between letters */
+    padding: 10px;
+    border-bottom: 3px solid #007bff; /* Blue underline */
+    display: inline-block; /* To fit the text width */
+  }
+  

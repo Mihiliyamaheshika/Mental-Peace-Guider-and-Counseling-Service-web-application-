@@ -13,7 +13,7 @@ const Home = () => {
           {/* Dropdown Menu */}
           <div className="relative">
             <button
-              className="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              className="bg-gray-400 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               Resource Library

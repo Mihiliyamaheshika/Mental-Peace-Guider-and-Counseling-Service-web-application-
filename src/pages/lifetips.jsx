@@ -1,11 +1,14 @@
+import React from "react";
+import ArticleList from "../components/articlelist";
+import "../app.css";
+
 const Lifetips = () => {
-    return (
-      <div>
-        <h1>Life Tips</h1>
-        <p>Here are some tips for a better life...</p>
-      </div>
-    );
-  };
-  
-  export default Lifetips;  // ✅ Default export added
-   
+  return (
+    <div>
+      <h1 className="article-title">Life Tips Articles</h1>
+      <ArticleList category="life" />
+    </div>
+  );
+};
+
+export default Lifetips;
