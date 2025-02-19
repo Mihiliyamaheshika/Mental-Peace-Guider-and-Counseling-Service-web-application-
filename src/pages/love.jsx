@@ -1,11 +1,14 @@
+import React from "react";
+import ArticleList from "../components/articlelist";
+import "../app.css";
+
 const Love = () => {
-    return (
-      <div>
-        <h1>Love</h1>
-        <p>Here are some tips for a better life...</p>
-      </div>
-    );
-  };
-  
-  export default Love;  // ✅ Default export added
-   
+  return (
+    <div>
+      <h1 className="article-title">For a Peaceful love mind</h1>
+      <ArticleList category="love" />
+    </div>
+  );
+};
+
+export default Love;
