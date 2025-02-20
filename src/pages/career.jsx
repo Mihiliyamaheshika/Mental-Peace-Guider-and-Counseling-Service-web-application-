@@ -1,11 +1,16 @@
+import React from "react";
+import ArticleList from "../components/articlelist";
+import "../app.css";
+
 const Career = () => {
-    return (
-      <div>
-        <h1>Career</h1>
-        <p>Here are some tips for a better life...</p>
-      </div>
-    );
-  };
-  
-  export default Career;  // ✅ Default export added
+  return (
+    <div>
+      <h1 className="article-title">Peaceful Career Life </h1>
+      <ArticleList category="career" />
+    </div>
+  );
+};
+
+export default Career;
+
    

@@ -36,6 +36,32 @@ const articles = {
     "/articles/child/child-8.jpg",
     "/articles/child/child-9.jpg",
   ],
+
+  "career": [
+    "/articles/career/career-1.jpg",
+    "/articles/career/career-2.jpg",
+    "/articles/career/career-3.jpg",
+    "/articles/career/career-4.jpg",
+    "/articles/career/career-5.jpg",
+    "/articles/career/career-6.jpg",
+    "/articles/career/career-7.jpg",
+    "/articles/career/career-8.jpg",
+    "/articles/career/career-9.jpg",
+  ],
+
+
+  "education": [
+    "/articles/education/education-1.jpg",
+    "/articles/education/education-2.jpg",
+    "/articles/education/education-3.jpg",
+    "/articles/education/education-4.jpg",
+    "/articles/education/education-5.jpg",
+    "/articles/education/education-6.jpg",
+    "/articles/education/education-7.jpg",
+    "/articles/education/education-8.jpg",
+    "/articles/education/education-9.jpg",
+  ],
+ 
  
 };
 
