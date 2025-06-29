@@ -31,12 +31,12 @@ const Dashboard = () => {
 
       {/* Buttons Section */}
       <div className="mt-6 w-full max-w-md p-6 bg-white bg-opacity-70 rounded-lg shadow-lg">
-        <button
-          onClick={() => navigate("/book-session")}
-          className="w-full bg-gray-500 text-white py-2 rounded-md my-2 hover:bg-blue-700 transition"
-        >
-          Book a session
-        </button>
+         <button
+      onClick={() => navigate("/Appointments")}
+      className="w-full bg-gray-500 text-white py-2 rounded-md my-2 hover:bg-blue-700 transition"
+    >
+      Book a Session
+    </button>
 
         <button
           onClick={() => navigate("/progress-tracker")}

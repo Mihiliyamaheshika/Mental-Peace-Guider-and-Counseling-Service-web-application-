@@ -18,7 +18,7 @@ const SignUp = () => {
 
       console.log("User registered:", user);
 
-      // ✅ Success Alert
+      //  Success Alert
       Swal.fire({
         title: "Registration Successful!",
         text: "Your account has been created successfully.",
@@ -32,7 +32,7 @@ const SignUp = () => {
     } catch (error) {
       console.error("Error signing up:", error.message);
 
-      // ❌ Error Alert
+      //  Error Alert
       Swal.fire({
         title: "Sign-Up Failed!",
         text: error.message,

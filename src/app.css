@@ -30,3 +30,53 @@
     display: inline-block; /* To fit the text width */
   }
   
+  .appointment-page {
+  text-align: center;
+  background-color: #c6e6f4;
+  min-height: 100vh;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.user-section, .counselor-section, .calendar-section {
+  margin: 20px auto;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+}
+
+button {
+  margin: 5px;
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #bde0f2;
+}
+
+.counselors-list {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.counselor-profile img {
+  border-radius: 50%;
+}
+
+.profile-btn {
+  margin-bottom: 10px;
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.action-buttons {
+  margin-top: 10px;
+}

@@ -14,6 +14,8 @@ import Career from "./pages/career";
 import Education from "./pages/education";
 import Dashboard from "./pages/dashboard"; // ✅ Importing Dashboard component
 
+
+
 function App() {
   return (
     <Router>
