@@ -1,17 +1,18 @@
 import React from 'react';
 
-const CounselorProfile = ({ name, imagePath, onClick }) => {
+const CounselorProfile = ({ name, imagePath, description, onClick }) => {
   return (
     <div
-      className="flex flex-col items-center space-y-2 p-3 border rounded-lg shadow hover:bg-gray-100 cursor-pointer transition"
+      className="max-w-xs bg-white rounded-2xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer p-4 flex flex-col items-center text-center"
       onClick={onClick}
     >
       <img
-        src={"Mental-Peace-Guider-and-Counseling-Service-web-application-\public\c1.jpeg"}
+        src={imagePath}
         alt={name}
-        className="w-20 h-20 rounded-full object-cover"
+        className="w-28 h-28 object-cover rounded-full border-4 border-blue-200 shadow-sm mb-3"
       />
-      <p className="text-center text-sm font-medium">{name}</p>
+      <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
+      <p className="text-sm text-gray-600 mt-1">{description}</p>
     </div>
   );
 };
