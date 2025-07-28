@@ -82,7 +82,7 @@ const Home = () => {
             Login
           </button>
           <button
-            onClick={() => navigate("/signup")}
+            onClick={() => navigate("/roleselection")}
             className="block w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-800 transition"
           >
             Sign up

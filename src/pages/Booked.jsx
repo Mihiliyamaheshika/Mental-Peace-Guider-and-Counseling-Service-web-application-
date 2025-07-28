@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ Required for navigation
 
 const Booked = () => {
+  const navigate = useNavigate(); // ✅ Define navigate using useNavigate
+
   const [sessions, setSessions] = useState([
     {
       id: 1,
@@ -28,13 +31,8 @@ const Booked = () => {
     },
   ]);
 
-  const handlePayment = (id) => {
-    setSessions((prev) =>
-      prev.map((session) =>
-        session.id === id ? { ...session, paid: true } : session
-      )
-    );
-    alert('Payment successful!');
+  const goToPayment = (id) => {
+    navigate(`/payment/${id}`); // ✅ Navigate to payment page with session ID
   };
 
   return (
@@ -63,10 +61,10 @@ const Booked = () => {
                     {/* Payment Button */}
                     {!session.paid && (
                       <button
-                        onClick={() => handlePayment(session.id)}
+                        onClick={() => goToPayment(session.id)}
                         className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded-full text-xs shadow transition duration-150"
                       >
-                        Payment
+                        Do payment
                       </button>
                     )}
 

@@ -53,7 +53,7 @@ const Dashboard = () => {
         </button>
 
         <button
-          onClick={() => navigate("/immediate-help")}
+          onClick={() => navigate("/immediate")}
           className="w-full bg-black text-white py-2 rounded-md my-2 hover:bg-gray-800 transition"
         >
           Need Immediate Help

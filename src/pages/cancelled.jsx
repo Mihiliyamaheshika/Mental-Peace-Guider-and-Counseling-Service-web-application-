@@ -48,7 +48,7 @@ const CancelledBookings = () => {
                 <td className="px-6 py-4 text-gray-700 whitespace-nowrap">{session.endTime}</td>
                 <td className="px-6 py-4 text-center">
                   <button className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded-full text-xs shadow transition duration-150">
-                    Reschedule
+                    Cancelled
                   </button>
                 </td>
               </tr>
