@@ -55,6 +55,14 @@ const Home = () => {
               </div>
             )}
           </div>
+          {/* Immediate Help Button */}
+          <button
+  className="bg-[#D7A6F7] text-white px-4 py-2 rounded-lg hover:bg-[#C78BEF] transition"
+  onClick={() => navigate("/immediate")}
+>
+  Immediate Help
+</button>
+
         </nav>
         <img src="/logo.png" alt="MindPeace Logo" className="h-20 mr-10" />
       </header>

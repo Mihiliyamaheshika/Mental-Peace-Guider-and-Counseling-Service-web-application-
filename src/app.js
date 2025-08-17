@@ -24,6 +24,8 @@ import Immediate from "./pages/immediate";
 import PaymentCancel from "./pages/PaymentCancel";
 import PaymentNotify from "./pages/PaymentNotify";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import ProgressTracker from "./pages/progresstracker";
+import Chatbot from "./pages/chatbot";
 
 function App() {
   return (
@@ -51,7 +53,8 @@ function App() {
         <Route path="/paymentcancel" element={<PaymentCancel />} />
         <Route path="/paymentnotify" element={<PaymentNotify />} />
         <Route path="/paymentsuccess" element={<PaymentSuccess />} />
-
+        <Route path="/progresstracker" element={<ProgressTracker />} />
+         <Route path="/chatbot" element={<Chatbot />} />
       </Routes>
     </Router>
   );

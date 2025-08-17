@@ -39,7 +39,7 @@ const Dashboard = () => {
     </button>
 
         <button
-          onClick={() => navigate("/progress-tracker")}
+          onClick={() => navigate("/progresstracker")}
           className="w-full bg-gray-500 text-white py-2 rounded-md my-2 hover:bg-blue-700 transition"
         >
           Mental Health Progress Tracker
@@ -49,7 +49,7 @@ const Dashboard = () => {
           onClick={() => navigate("/chatbot")}
           className="w-full bg-gray-500 text-white py-2 rounded-md my-2 hover:bg-blue-700 transition"
         >
-          Chatbot for Quick Guidance
+          Quick Guidance
         </button>
 
         <button

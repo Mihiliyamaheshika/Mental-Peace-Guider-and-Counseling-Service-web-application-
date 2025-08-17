@@ -4,6 +4,7 @@ import { PhoneCall } from "lucide-react";
 const Immediate = () => {
   const handleEmergencyCall = () => {
     alert("Connecting you to an available counselor...");
+    // Optionally, trigger a real call: window.location.href = "tel:+94771234567";
   };
 
   return (
@@ -15,13 +16,15 @@ const Immediate = () => {
         <p className="text-center text-gray-700">
           If you're feeling overwhelmed or in a crisis, please don’t wait. Tap the button below to immediately connect with an available counselor.
         </p>
+
         <button
           onClick={handleEmergencyCall}
-          className="bg-[#E8C2FF] hover:bg-[#D7A6F7] text-white px-6 py-3 text-lg rounded-lg flex items-center space-x-2"
+          className="bg-[#9D00FF] hover:bg-[#7A00CC] text-white px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-3 animate-pulse"
         >
-          <PhoneCall className="w-5 h-5" />
+          <PhoneCall className="w-6 h-6" />
           <span>Call a Counselor Now</span>
         </button>
+
         <p className="text-sm text-gray-500 text-center mt-4">
           We’re here 24/7. Your safety matters most.
         </p>
