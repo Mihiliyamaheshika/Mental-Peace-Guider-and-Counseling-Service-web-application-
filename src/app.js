@@ -1,3 +1,4 @@
+// App.js
 // Import necessary modules for React Router
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -14,7 +15,7 @@ import Career from "./pages/career";
 import Education from "./pages/education";
 import Booked from "./pages/Booked";
 import Cancelled from "./pages/cancelled";
-import Dashboard from "./pages/dashboard"; // ✅ Importing Dashboard component
+import Dashboard from "./pages/dashboard";
 import CounselorProfile from "./pages/CounselorProfile";
 import CounselorProfilePage from "./pages/CounselorProfilePage";
 import RoleSelection from "./pages/roleselection";
@@ -32,7 +33,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} /> {/* ✅ Added Dashboard route */}
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/booking" element={<Booking />} />
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/counselor-profile/:name" element={<CounselorProfilePage />} />
@@ -46,15 +47,14 @@ function App() {
         <Route path="/career" element={<Career />} />
         <Route path="/education" element={<Education />} />
         <Route path="/roleselection" element={<RoleSelection />} />
-            <Route path="/immediate" element={<Immediate/>} />
+        <Route path="/immediate" element={<Immediate />} />
         <Route path="/counselorsignup" element={<CounselorSignup />} />
-
         <Route path="/payment/:sessionId" element={<Payment />} />
         <Route path="/paymentcancel" element={<PaymentCancel />} />
         <Route path="/paymentnotify" element={<PaymentNotify />} />
         <Route path="/paymentsuccess" element={<PaymentSuccess />} />
         <Route path="/progresstracker" element={<ProgressTracker />} />
-         <Route path="/chatbot" element={<Chatbot />} />
+        <Route path="/chatbot" element={<Chatbot />} />
       </Routes>
     </Router>
   );

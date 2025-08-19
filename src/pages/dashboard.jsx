@@ -1,28 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAuth, onAuthStateChanged } from "firebase/auth"; // ✅ Import Firebase Auth
+import { AuthContext } from "../context/AuthContext"; // Use JWT user info from login
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState(""); // ✅ State to store the user's name
+  const { user } = useContext(AuthContext); // Get logged-in user info from context
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    const auth = getAuth();
-    
-    // ✅ Listen for user authentication state
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // ✅ Get user's display name from Firebase
-        setUserName(user.displayName || "User"); // Default to "User" if no name is set
-      }
-    });
-  }, []);
+    if (user && user.FullName) {
+      setUserName(user.FullName); // Use FullName from JWT
+    } else {
+      setUserName("User"); // Default if user info is missing
+    }
+  }, [user]);
 
   return (
-    
     <div
       className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/4.jpg')" }} // ✅ Set background image
+      style={{ backgroundImage: "url('/4.jpg')" }}
     >
       {/* Header */}
       <h1 className="text-2xl font-semibold text-center text-gray-900 bg-white bg-opacity-50 px-4 py-2 rounded-lg">
@@ -31,12 +27,12 @@ const Dashboard = () => {
 
       {/* Buttons Section */}
       <div className="mt-6 w-full max-w-md p-6 bg-white bg-opacity-70 rounded-lg shadow-lg">
-         <button
-      onClick={() => navigate("/Appointments")}
-      className="w-full bg-gray-500 text-white py-2 rounded-md my-2 hover:bg-blue-700 transition"
-    >
-      Book a Session
-    </button>
+        <button
+          onClick={() => navigate("/Appointments")}
+          className="w-full bg-gray-500 text-white py-2 rounded-md my-2 hover:bg-blue-700 transition"
+        >
+          Book a Session
+        </button>
 
         <button
           onClick={() => navigate("/progresstracker")}
