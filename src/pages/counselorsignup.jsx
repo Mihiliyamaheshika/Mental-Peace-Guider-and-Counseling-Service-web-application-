@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { registerCounselor } from "../services/authService"; // Import your auth service
 
 const CounselorSignUp = () => {
-  const [title, setTitle] = useState('');
-  const [name, setName] = useState('');
-  const [gender, setGender] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -16,30 +18,53 @@ const CounselorSignUp = () => {
     setPreview(URL.createObjectURL(file));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('name', name);
-    formData.append('gender', gender);
-    formData.append('email', email);
-    formData.append('password', password);
-    formData.append('description', description);
-    formData.append('image', image);
+    try {
+      // Prepare form data
+      const formData = new FormData();
+      formData.append("fullName", name);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("role", "Counselor"); // explicitly set role
+      formData.append("title", title);
+      formData.append("gender", gender);
+      formData.append("description", description);
+      if (image) formData.append("image", image);
 
-    // Just log for now
-    console.log({
-      title,
-      name,
-      gender,
-      email,
-      password,
-      description,
-      image
-    });
+      // Call backend API
+      const response = await registerCounselor({
+        fullName: name,
+        email,
+        password,
+        confirmPassword: password, // assuming confirmPassword same as password here
+        title,
+        gender,
+        description,
+        image,
+        role: "Counselor",
+      });
 
-    alert("Counselor signed up successfully!");
+      alert("Counselor registered successfully!");
+      console.log("API response:", response);
+
+      // Clear form
+      setTitle("");
+      setName("");
+      setGender("");
+      setEmail("");
+      setPassword("");
+      setDescription("");
+      setImage(null);
+      setPreview(null);
+    } catch (error) {
+      console.error("Registration failed:", error);
+      alert(error?.message || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,7 +76,7 @@ const CounselorSignUp = () => {
       >
         <h2 className="text-2xl font-bold text-center mb-6">Counselor Sign Up</h2>
 
-        {/* Title */}
+        {/* Profile Title */}
         <div className="mb-4">
           <label className="block mb-2 text-gray-700">Profile Title</label>
           <input
@@ -64,7 +89,7 @@ const CounselorSignUp = () => {
           />
         </div>
 
-        {/* Name */}
+        {/* Full Name */}
         <div className="mb-4">
           <label className="block mb-2 text-gray-700">Full Name</label>
           <input
@@ -86,7 +111,7 @@ const CounselorSignUp = () => {
                 type="radio"
                 name="gender"
                 value="Male"
-                checked={gender === 'Male'}
+                checked={gender === "Male"}
                 onChange={(e) => setGender(e.target.value)}
                 className="mr-2"
               />
@@ -97,7 +122,7 @@ const CounselorSignUp = () => {
                 type="radio"
                 name="gender"
                 value="Female"
-                checked={gender === 'Female'}
+                checked={gender === "Female"}
                 onChange={(e) => setGender(e.target.value)}
                 className="mr-2"
               />
@@ -135,12 +160,7 @@ const CounselorSignUp = () => {
         {/* Image Upload */}
         <div className="mb-4">
           <label className="block mb-2 text-gray-700">Profile Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="w-full"
-          />
+          <input type="file" accept="image/*" onChange={handleImageChange} className="w-full" />
           {preview && (
             <img
               src={preview}
@@ -165,9 +185,10 @@ const CounselorSignUp = () => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          disabled={loading}
+          className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
         >
-          Submit & Register
+          {loading ? "Registering..." : "Submit & Register"}
         </button>
       </form>
     </div>

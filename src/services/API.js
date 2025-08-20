@@ -1,8 +1,12 @@
 import axios from "axios";
 
-// Create axios instance
+// Base URL from environment variable or fallback
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://localhost:5001";
+
+// Create Axios instance
 const API = axios.create({
- baseURL: "https://localhost:5001/api", // Your backend URL
+  baseURL: `${API_BASE_URL}/api`, // Prepend /api for all requests
+  headers: { "Content-Type": "application/json" },
 });
 
 // Automatically add JWT token to requests
@@ -14,9 +18,7 @@ API.interceptors.request.use(
     }
     return req;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Handle responses and errors globally
@@ -27,7 +29,7 @@ API.interceptors.response.use(
       const { status } = error.response;
 
       if (status === 401) {
-        // Unauthorized → Token might be expired or invalid
+        // Unauthorized → token might be expired or invalid
         localStorage.removeItem("token");
         window.location.href = "/login"; // redirect to login
       } else if (status === 403) {
@@ -46,3 +48,24 @@ API.interceptors.response.use(
 );
 
 export default API;
+
+// --- Auth helper functions using this Axios instance ---
+
+export const registerUser = async ({ fullName, email, password, confirmPassword }) => {
+  try {
+    const response = await API.post("/auth/register", { fullName, email, password, confirmPassword , role: "User" });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const registerCounselor = async ({ fullName, email, password, confirmPassword }) => {
+  try {
+    // Include role explicitly in payload if needed
+    const response = await API.post("/auth/register", { fullName, email, password, confirmPassword, role: "Counselor" });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
