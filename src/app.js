@@ -16,7 +16,7 @@ import Education from "./pages/education";
 import Booked from "./pages/Booked";
 import Cancelled from "./pages/cancelled";
 import Dashboard from "./pages/dashboard";
-import CounselorProfile from "./pages/CounselorProfile";
+import CounselorProfile from "./pages/counselorprofile";
 import CounselorProfilePage from "./pages/CounselorProfilePage";
 import RoleSelection from "./pages/roleselection";
 import CounselorSignup from "./pages/counselorsignup";
@@ -37,6 +37,7 @@ function App() {
         <Route path="/booking" element={<Booking />} />
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/counselor-profile/:name" element={<CounselorProfilePage />} />
+         <Route path="/counselorprofile" element={<CounselorProfile/>} />
         <Route path="/login" element={<Login />} />
         <Route path="/booked" element={<Booked />} />
         <Route path="/cancelled" element={<Cancelled />} />
