@@ -49,21 +49,46 @@ API.interceptors.response.use(
 
 export default API;
 
-// --- Auth helper functions using this Axios instance ---
+// --- Auth / Registration helper functions ---
 
+// Register normal user
 export const registerUser = async ({ fullName, email, password, confirmPassword }) => {
   try {
-    const response = await API.post("/auth/register", { fullName, email, password, confirmPassword , role: "User" });
+    const response = await API.post("/auth/register", {
+      fullName,
+      email,
+      password,
+      confirmPassword,
+      role: "User",
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
   }
 };
 
-export const registerCounselor = async ({ fullName, email, password, confirmPassword }) => {
+// Register counselor (with Cloudinary imageUrl)
+export const registerCounselor = async ({
+  title,
+  fullName,
+  gender,
+  email,
+  password,
+  profileName,
+  description,
+  imageUrl,
+}) => {
   try {
-    // Include role explicitly in payload if needed
-    const response = await API.post("/auth/register", { fullName, email, password, confirmPassword, role: "Counselor" });
+    const response = await API.post("/Counselors", {
+      title,
+      fullName,
+      gender,
+      email,
+      password,
+      profileName,
+      description,
+      imageUrl, // Cloudinary URL
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;

@@ -11,12 +11,20 @@ export const register = async (data) => {
   }
 };
 
-// Register new counselor
+// Register new counselor → send to /Counselors, not /auth/register
 export const registerCounselor = async (data) => {
   try {
-    // Ensure role is "Counselor"
-    data.role = "Counselor";
-    const response = await API.post("/auth/register", data);
+    const response = await API.post("/Counselors", {
+      title: data.title,
+      fullName: data.fullName,
+      gender: data.gender,
+      email: data.email,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+      profileName: data.profileName,  // short name or nickname
+      description: data.description,
+      imageUrl: data.imageUrl,        // Cloudinary URL
+    });
     return response.data;
   } catch (error) {
     console.error("API registerCounselor error:", error.response?.data || error.message);

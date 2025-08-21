@@ -87,6 +87,9 @@ const Booking = () => {
     <div className="max-w-md mx-auto p-3 bg-white shadow rounded-lg mt-6 text-sm">
       <h2 className="text-xl font-semibold text-center text-teal-700 mb-3">Book Counseling</h2>
 
+
+
+
       <form onSubmit={handleSubmit} className="space-y-3">
         {/* Country */}
         <div>
@@ -174,6 +177,10 @@ const Booking = () => {
           ></textarea>
         </div>
 
+{/* Professional Reminder */}
+<p className="text-sm text-gray-600 text-center mb-4">
+  Please ensure that you complete the payment <span className="font-semibold">once your booking is confirmed by the counselor</span> to secure your appointment.
+</p>
         {/* Submit */}
         <div className="text-center pt-1">
           <button

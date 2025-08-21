@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { registerCounselor } from "../services/authService"; // Import your auth service
+import axios from "axios";
+
+const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dlyzgligk/upload";
+const UPLOAD_PRESET = "Counselor-image"; // Set in Cloudinary dashboard
 
 const CounselorSignUp = () => {
   const [title, setTitle] = useState("");
@@ -23,18 +27,19 @@ const CounselorSignUp = () => {
     setLoading(true);
 
     try {
-      // Prepare form data
-      const formData = new FormData();
-      formData.append("fullName", name);
-      formData.append("email", email);
-      formData.append("password", password);
-      formData.append("role", "Counselor"); // explicitly set role
-      formData.append("title", title);
-      formData.append("gender", gender);
-      formData.append("description", description);
-      if (image) formData.append("image", image);
+      let imageUrl = null;
 
-      // Call backend API
+      // ✅ Upload to Cloudinary if image selected
+      if (image) {
+        const formData = new FormData();
+        formData.append("file", image);
+        formData.append("upload_preset", UPLOAD_PRESET);
+
+        const res = await axios.post(CLOUDINARY_URL, formData);
+        imageUrl = res.data.secure_url;
+      }
+
+      // ✅ Call backend API with Cloudinary image URL
       const response = await registerCounselor({
         fullName: name,
         email,
@@ -43,8 +48,9 @@ const CounselorSignUp = () => {
         title,
         gender,
         description,
-        image,
-        role: "Counselor",
+        profileName: name, // 👈 Save image URL in DB
+        imageUrl: imageUrl,
+        //role: "Counselor",
       });
 
       alert("Counselor registered successfully!");
@@ -72,7 +78,6 @@ const CounselorSignUp = () => {
       <form
         onSubmit={handleSubmit}
         className="bg-white shadow-md rounded-xl p-6 w-full max-w-lg"
-        encType="multipart/form-data"
       >
         <h2 className="text-2xl font-bold text-center mb-6">Counselor Sign Up</h2>
 
