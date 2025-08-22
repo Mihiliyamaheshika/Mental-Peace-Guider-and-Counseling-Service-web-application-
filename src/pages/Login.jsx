@@ -1,23 +1,17 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/authService"; // Backend login API
-import { AuthContext } from "../context/AuthContext"; // Context to store user
+import { login } from "../services/authService";
+import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
 const Login = () => {
   const navigate = useNavigate();
-  const authContext = useContext(AuthContext);
+  const { setUser } = useContext(AuthContext);
 
-  if (!authContext) {
-    throw new Error("AuthContext must be used within AuthProvider");
-  }
-
-  const { setUser } = authContext;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Decode JWT manually
   const decodeToken = (token) => {
     try {
       const payload = token.split(".")[1];
@@ -31,7 +25,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await login({ email, password }); // backend returns { token, user }
+      const res = await login({ email, password });
       const token = res.token;
       const user = res.user;
 
@@ -40,28 +34,40 @@ const Login = () => {
         return;
       }
 
-      // Save token in localStorage
+      const decoded = decodeToken(token);
+const finalUser = {
+  ...user,
+  role: (user.role || decoded?.role)?.toLowerCase(), // ✅ convert role to lowercase
+  FullName: user.FullName || decoded?.FullName,
+};
+
+
       localStorage.setItem("token", token);
+      setUser(finalUser);
 
-      // Save user in context
-      setUser(user);
-
-      // ✅ Success alert
       await Swal.fire({
         title: "Login Successful!",
-        text: "Redirecting to dashboard...",
+        text: "Redirecting...",
         icon: "success",
         confirmButtonColor: "#3085d6",
         confirmButtonText: "OK",
       });
 
-      navigate("/dashboard");
+      if (finalUser.role === "counselor") {
+  navigate("/counselor/booked", { replace: true });
+} else if (finalUser.role === "user") {
+  navigate("/dashboard", { replace: true });
+} else {
+  navigate("/", { replace: true });
+}
 
     } catch (error) {
       console.error("Login error:", error.response?.data || error.message);
       Swal.fire({
         title: "Login Failed!",
-        text: error.response?.data?.message || "Unable to connect to server or invalid credentials",
+        text:
+          error.response?.data?.message ||
+          "Unable to connect to server or invalid credentials",
         icon: "error",
         confirmButtonColor: "#d33",
         confirmButtonText: "Try Again",
@@ -75,7 +81,9 @@ const Login = () => {
       style={{ backgroundImage: "url('/3.jpg')" }}
     >
       <div className="bg-white p-8 rounded-lg shadow-lg w-96 mt-6">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">Welcome!</h2>
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
+          Welcome!
+        </h2>
         <form onSubmit={handleLogin} className="mt-4">
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-semibold">Email</label>

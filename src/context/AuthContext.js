@@ -4,12 +4,13 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Function to decode JWT manually
+  // Decode JWT manually
   const decodeToken = (token) => {
     try {
-      const payload = token.split(".")[1]; // get the middle part of the token
-      return JSON.parse(atob(payload)); // decode base64 and parse JSON
+      const payload = token.split(".")[1];
+      return JSON.parse(atob(payload));
     } catch (error) {
       console.error("Invalid token", error);
       return null;
@@ -20,13 +21,23 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     if (token) {
       const decodedUser = decodeToken(token);
-      if (decodedUser) setUser(decodedUser);
-      else localStorage.removeItem("token");
+      if (decodedUser && decodedUser.role) {
+        setUser(decodedUser);
+      } else {
+        localStorage.removeItem("token");
+        setUser(null);
+      }
     }
+    setLoading(false);
   }, []);
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

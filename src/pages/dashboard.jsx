@@ -8,12 +8,19 @@ const Dashboard = () => {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
+    // Redirect if user is not logged in or role is not "user"
+    if (!user) {
+      navigate("/login"); // not logged in
+    } else if (user.role !== "user") {
+      navigate("/"); // redirect other roles
+    }
+
     if (user && user.FullName) {
       setUserName(user.FullName); // Use FullName from JWT
     } else {
       setUserName("User"); // Default if user info is missing
     }
-  }, [user]);
+  }, [user, navigate]);
 
   return (
     <div
