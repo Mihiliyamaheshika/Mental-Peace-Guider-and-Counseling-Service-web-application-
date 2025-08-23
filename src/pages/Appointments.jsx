@@ -1,20 +1,59 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import CounselorProfile from './CounselorProfile';
+import axios from 'axios';
 
 const AppointmentPage = () => {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedCounselor, setSelectedCounselor] = useState('');
+  const [selectedCounselor, setSelectedCounselor] = useState(null); // store full counselor object
   const [action, setAction] = useState('Booking');
   const [startTime, setStartTime] = useState('');
   const [startAmPm, setStartAmPm] = useState('');
   const [endTime, setEndTime] = useState('');
   const [endAmPm, setEndAmPm] = useState('');
+  const [counselors, setCounselors] = useState([]);
+
+  const timeOptions = [
+    '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
+    '11:00', '11:30', '12:00', '12:30', '01:00', '01:30',
+    '02:00', '02:30', '03:00', '03:30', '04:00', '04:30',
+    '05:00', '05:30',
+  ];
+
+  // Map weekday names -> JS day index
+  const weekdayMap = {
+    Sunday: 0,
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6,
+  };
+
+  // Fetch counselors from backend
+  useEffect(() => {
+    axios.get('https://localhost:5001/api/Counselors')
+      .then(res => {
+        const mapped = res.data.map(c => ({
+          counselorID: c.counselorID,
+          fullName: c.fullName,
+          title: c.title,
+          email: c.email,
+          profileName: c.profileName,
+          description: c.description,
+          imageUrl: c.imageUrl || '/images/c1.jpeg',
+          availabilityDays: c.availabilityDays, // e.g. "Friday,Sunday"
+        }));
+        setCounselors(mapped);
+      })
+      .catch(err => console.error('Error fetching counselors:', err));
+  }, []);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -24,27 +63,22 @@ const AppointmentPage = () => {
     setEndAmPm('');
   };
 
-  const handleCounselorSelect = (name) => {
-    setSelectedCounselor(name);
+  const handleCounselorSelect = (counselor) => {
+    setSelectedCounselor(counselor); // store the full counselor object
     setStartTime('');
     setStartAmPm('');
     setEndTime('');
     setEndAmPm('');
   };
 
-  const handleViewProfile = (name) => {
-    navigate(`/counselor-profile/${name}`);
+  const handleViewProfile = (c) => {
+    navigate(`/counselor-profile/${c.counselorID}`, { state: { counselor: c } });
   };
 
   const handleActionChange = (actionType) => {
     setAction(actionType);
-    if (actionType === 'Booking') {
-      navigate('/booked');
-    }
-     else if (actionType === 'Cancelling') {
-    navigate('/cancelled');
-     }
-    
+    if (actionType === 'Booking') navigate('/booked');
+    else if (actionType === 'Cancelling') navigate('/cancelled');
   };
 
   const handleCancel = () => {
@@ -53,25 +87,16 @@ const AppointmentPage = () => {
     setStartAmPm('');
     setEndTime('');
     setEndAmPm('');
-    setSelectedCounselor('');
+    setSelectedCounselor(null);
   };
 
-  const scrollLeft = () => {
-    scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
-  };
+  const scrollLeft = () => scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+  const scrollRight = () => scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
 
-  const scrollRight = () => {
-    scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
-  };
-
-  const timeOptions = [
-    '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
-    '11:00', '11:30', '12:00', '12:30', '01:00', '01:30',
-    '02:00', '02:30', '03:00', '03:30', '04:00', '04:30',
-    '05:00', '05:30',
-  ];
-
-  const counselorImage = "/images/c1.jpeg";
+  // Convert availability string -> weekday indices
+  const availableDays = selectedCounselor?.availabilityDays
+    ?.split(',')
+    .map(day => weekdayMap[day.trim()]);
 
   return (
     <div className="max-w-6xl mx-auto p-4 space-y-6">
@@ -79,9 +104,10 @@ const AppointmentPage = () => {
         Your Journey to Mental Peace Begins Here!
       </h1>
 
-      {/* User Info and Action Buttons */}
       <div className="bg-blue-50 p-3 rounded-lg shadow space-y-3">
-        <p className="text-base font-medium">User Name: Ann</p>
+        <p className="text-base font-medium">
+          Dear User, here's is your approved and cancelled booking list
+        </p>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleActionChange('Booking')}
@@ -89,7 +115,6 @@ const AppointmentPage = () => {
           >
             Bookings
           </button>
-
           <button
             onClick={() => handleActionChange('Cancelling')}
             className="px-3 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 text-sm transition"
@@ -99,43 +124,47 @@ const AppointmentPage = () => {
         </div>
       </div>
 
-      {/* Counselors Section with arrows */}
       <div>
         <h3 className="text-lg font-semibold text-gray-700 mb-2">Counselors' Profiles</h3>
-
         <div className="flex items-center gap-2">
-          {/* Left Arrow */}
           <button
             onClick={scrollLeft}
             className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-sm"
           >
             ←
           </button>
-
-          {/* Scrollable Counselor Grid */}
           <div
             ref={scrollRef}
             className="flex overflow-x-auto gap-6 scrollbar-hide px-2"
             style={{ paddingBottom: '6px' }}
           >
-            {['Mrs.Melsy', 'Mrs.Aurora', 'Mrs.Julie', 'Mrs.Sheedy'].map((name) => (
-              <div key={name} className="flex flex-col items-center space-y-1 min-w-[140px] max-w-[160px]">
+            {counselors.map((c) => (
+              <div
+                key={c.counselorID}
+                className="flex flex-col items-center space-y-1 min-w-[140px] max-w-[160px]"
+              >
                 <CounselorProfile
-                  name={name}
-                  imagePath={counselorImage}
-                  onClick={() => handleViewProfile(name)}
+                  name={c.fullName}
+                  imagePath={c.imageUrl}
+                  title={c.title}
+                  onClick={() => handleViewProfile(c)}
                 />
+
                 <button
-                  onClick={() => handleCounselorSelect(name)}
-                  className={`w-4 h-4 rounded ${selectedCounselor === name ? 'bg-green-500' : 'bg-gray-300'} hover:bg-green-400 transition`}
-                  title={`Select ${name}`}
+                  onClick={() => handleCounselorSelect(c)}
+                  className={`w-4 h-4 rounded ${
+                    selectedCounselor?.counselorID === c.counselorID
+                      ? 'bg-green-500'
+                      : 'bg-gray-300'
+                  } hover:bg-green-400 transition`}
+                  title={`Select ${c.fullName}`}
                 ></button>
-                <span className="text-xs">{selectedCounselor === name ? 'Selected' : ''}</span>
+                <span className="text-xs">
+                  {selectedCounselor?.counselorID === c.counselorID ? 'Selected' : ''}
+                </span>
               </div>
             ))}
           </div>
-
-          {/* Right Arrow */}
           <button
             onClick={scrollRight}
             className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-sm"
@@ -145,19 +174,19 @@ const AppointmentPage = () => {
         </div>
       </div>
 
-      {/* Selected Counselor Name */}
       {selectedCounselor && (
         <p className="text-center text-teal-600 font-medium text-base">
-          Selected Counselor: {selectedCounselor}
+          Selected Counselor: {selectedCounselor.fullName}
         </p>
+        
       )}
 
-      {/* Calendar Section */}
       <div className="bg-gray-50 p-4 rounded-lg shadow space-y-3">
         <p className="text-base font-semibold text-gray-700">
-          Availability of <span className="text-teal-600">{selectedCounselor || '---'}</span> ›
+          Availability of{' '}
+          <span className="text-teal-600">{selectedCounselor?.fullName || '---'}</span> 
+       <span className="text-slate-400" > | *** Available days are highlighted in green on the calendar for easy identification.***|</span> 
         </p>
-
         <div className="flex justify-center mt-2 mb-2">
           <div className="p-2 bg-white rounded-md shadow-sm scale-90 sm:scale-90 md:scale-75 lg:scale-75">
             <Calendar
@@ -167,8 +196,12 @@ const AppointmentPage = () => {
               tileClassName={({ date }) => {
                 const isToday = date.toDateString() === new Date().toDateString();
                 const isSelected = date.toDateString() === selectedDate.toDateString();
+                const isAvailable =
+                  availableDays && availableDays.includes(date.getDay());
+
                 let classes = 'rounded-md py-1 px-2 transition text-xs';
-                if (isToday) classes += ' bg-blue-100 text-blue-800 font-medium ';
+                if (isAvailable) classes += ' bg-green-100 text-green-800 font-semibold ';
+                if (isToday) classes += ' border border-blue-400 ';
                 if (isSelected) classes += ' bg-teal-500 text-white ';
                 else classes += ' hover:bg-teal-100 hover:text-teal-800 ';
                 return classes;
@@ -176,14 +209,15 @@ const AppointmentPage = () => {
             />
           </div>
         </div>
-
         <p className="text-center text-gray-600 text-sm">
-          Selected Date: <span className="font-semibold">{selectedDate.toDateString()}</span>
+          Selected Date:{' '}
+          <span className="font-semibold">{selectedDate.toDateString()}</span>
         </p>
 
-        {/* Time Selection */}
         <div className="flex flex-col items-center space-y-3">
-          <label className="text-sm font-medium text-gray-700">Select Start Time:</label>
+          <label className="text-sm font-medium text-gray-700">
+            Select Start Time:
+          </label>
           <div className="flex gap-2">
             <select
               value={startTime}
@@ -192,10 +226,11 @@ const AppointmentPage = () => {
             >
               <option value="">-- Start Time --</option>
               {timeOptions.map((time) => (
-                <option key={time} value={time}>{time}</option>
+                <option key={time} value={time}>
+                  {time}
+                </option>
               ))}
             </select>
-
             <select
               value={startAmPm}
               onChange={(e) => setStartAmPm(e.target.value)}
@@ -207,7 +242,9 @@ const AppointmentPage = () => {
             </select>
           </div>
 
-          <label className="text-sm font-medium text-gray-700">Select End Time:</label>
+          <label className="text-sm font-medium text-gray-700">
+            Select End Time:
+          </label>
           <div className="flex gap-2">
             <select
               value={endTime}
@@ -216,10 +253,11 @@ const AppointmentPage = () => {
             >
               <option value="">-- End Time --</option>
               {timeOptions.map((time) => (
-                <option key={time} value={time}>{time}</option>
+                <option key={time} value={time}>
+                  {time}
+                </option>
               ))}
             </select>
-
             <select
               value={endAmPm}
               onChange={(e) => setEndAmPm(e.target.value)}
@@ -238,15 +276,13 @@ const AppointmentPage = () => {
           )}
         </div>
 
-        {/* Bottom Action Buttons */}
         <div className="flex flex-wrap justify-center gap-2 pt-3">
           <button
-             onClick={() => navigate('/booking')}
+            onClick={() => navigate('/booking')}
             className="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 text-sm transition"
           >
             Ready to book
           </button>
-
           <button
             onClick={handleCancel}
             className="px-3 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 text-sm transition"

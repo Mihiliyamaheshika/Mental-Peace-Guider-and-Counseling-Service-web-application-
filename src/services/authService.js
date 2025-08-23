@@ -11,19 +11,18 @@ export const register = async (data) => {
   }
 };
 
-// Register new counselor → send to /Counselors, not /auth/register
 export const registerCounselor = async (data) => {
   try {
-    const response = await API.post("/Counselors", {
-      title: data.title,
-      fullName: data.fullName,
-      gender: data.gender,
-      email: data.email,
-      password: data.password,
-      confirmPassword: data.confirmPassword,
-      profileName: data.profileName,  // short name or nickname
-      description: data.description,
-      imageUrl: data.imageUrl,        // Cloudinary URL
+    const response = await API.post("/Counselors/signup", {
+      Title: data.Title || data.title || "",
+      FullName: data.FullName || data.fullName || "",
+      Gender: data.Gender || data.gender || "",
+      Email: data.Email || data.email || "",
+      Password: data.Password || data.password || "",
+      ProfileName: data.ProfileName || data.profileName || "",
+      Description: data.Description || data.description || "",
+      ImageUrl: data.ImageUrl || data.imageUrl || "",
+      AvailabilityDays: data.AvailabilityDays || data.availabilityDays || ""
     });
     return response.data;
   } catch (error) {

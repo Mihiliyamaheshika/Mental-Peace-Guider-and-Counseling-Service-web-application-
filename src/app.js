@@ -75,11 +75,11 @@ function App() {
           <Route path="/paymentsuccess" element={<ProtectedRoute role="user"><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/progresstracker" element={<ProtectedRoute role="user"><ProgressTracker /></ProtectedRoute>} />
           <Route path="/chatbot" element={<ProtectedRoute role="user"><Chatbot /></ProtectedRoute>} />
-
+              <Route path="/counselor-profile/:id" element={<ProtectedRoute role="user"><CounselorProfilePage /></ProtectedRoute>} />
+          <Route path="/CounselorProfile" element={<ProtectedRoute role="user"><CounselorProfile /></ProtectedRoute>} />
           {/* Counselor Pages (Protected) */}
           <Route path="/counselor/booked" element={<ProtectedRoute role="counselor"><CounselorBooked /></ProtectedRoute>} />
-          <Route path="/counselor-profile/:name" element={<ProtectedRoute role="counselor"><CounselorProfilePage /></ProtectedRoute>} />
-          <Route path="/CounselorProfile" element={<ProtectedRoute role="counselor"><CounselorProfile /></ProtectedRoute>} />
+      
 
           {/* Life Tips & Other Resources (Public) */}
           <Route path="/lifetips" element={<Lifetips />} />
