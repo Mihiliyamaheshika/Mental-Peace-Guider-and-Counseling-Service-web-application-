@@ -1,38 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
 
 const CounselorBooked = () => {
-  const [appointments, setAppointments] = useState([
-    {
-      id: 1,
-      user: 'John Doe',
-      date: '2025-07-05',
-      startTime: '10:00 AM',
-      endTime: '11:00 AM',
-      paid: true,
-      confirmed: false,
-    },
-    {
-      id: 2,
-      user: 'Emily Smith',
-      date: '2025-07-07',
-      startTime: '2:00 PM',
-      endTime: '3:00 PM',
-      paid: false,
-      confirmed: false,
-    },
-  ]);
+  const { user } = useContext(AuthContext); // get logged-in user from context
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Get counselorId from context or fallback to localStorage
+  const counselorId = Number(user?.CounselorId || user?.counselorId || localStorage.getItem('counselorId'));
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      if (!counselorId) {
+        console.warn('Counselor ID is missing! Waiting for login or localStorage...');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `https://localhost:5001/api/BookingRequests/counselor/${counselorId}`
+        );
+        setAppointments(response.data);
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [counselorId]);
 
   const confirmAppointment = (id) => {
-    setAppointments((prev) =>
-      prev.map((appt) =>
-        appt.id === id ? { ...appt, confirmed: true } : appt
+    setAppointments(prev =>
+      prev.map(appt =>
+        appt.requestID === id ? { ...appt, confirmed: true } : appt
       )
     );
   };
 
   const cancelAppointment = (id) => {
-    setAppointments((prev) => prev.filter((appt) => appt.id !== id));
+    setAppointments(prev => prev.filter(appt => appt.requestID !== id));
   };
+
+  const formatTime = (isoString) => {
+    if (!isoString) return '-';
+    const date = new Date(isoString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatDate = (isoString) => {
+    if (!isoString) return '-';
+    const date = new Date(isoString);
+    return date.toLocaleDateString();
+  };
+
+  if (loading) return <div className="p-6">Loading appointments...</div>;
+  if (!appointments.length) return <div className="p-6">No bookings found for this counselor.</div>;
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -48,28 +74,21 @@ const CounselorBooked = () => {
               <th className="px-4 py-2 text-left">Date</th>
               <th className="px-4 py-2 text-left">Start Time</th>
               <th className="px-4 py-2 text-left">End Time</th>
-              <th className="px-4 py-2 text-left">Paid</th>
+              <th className="px-4 py-2 text-left">Status</th>
               <th className="px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-gray-100">
-            {appointments.map((appt) => (
-              <tr key={appt.id} className="hover:bg-gray-50 transition-colors duration-150">
-                <td className="px-4 py-2 text-gray-800 font-medium">{appt.user}</td>
-                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{appt.date}</td>
-                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{appt.startTime}</td>
-                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{appt.endTime}</td>
-                <td className="px-4 py-2 text-center font-medium">
-                  {appt.paid ? (
-                    <span className="text-green-700">Paid</span>
-                  ) : (
-                    <span className="text-red-600">Not Paid</span>
-                  )}
-                </td>
+            {appointments.map(appt => (
+              <tr key={appt.requestID} className="hover:bg-gray-50 transition-colors duration-150">
+                <td className="px-4 py-2 text-gray-800 font-medium">{appt.userName || '-'}</td>
+                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{formatDate(appt.requestedDateTime)}</td>
+                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{formatTime(appt.requestedDateTime)}</td>
+                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{formatTime(appt.endDateTime)}</td>
+                <td className="px-4 py-2 text-center font-medium">{appt.status || '-'}</td>
                 <td className="px-4 py-2">
                   <div className="flex justify-center space-x-2 whitespace-nowrap">
-                    {/* To Session */}
                     <button
                       className={`px-3 py-1 rounded-full text-xs shadow transition duration-150 ${
                         appt.confirmed && appt.paid
@@ -81,19 +100,17 @@ const CounselorBooked = () => {
                       To Session
                     </button>
 
-                    {/* Confirm */}
                     {!appt.confirmed && (
                       <button
-                        onClick={() => confirmAppointment(appt.id)}
+                        onClick={() => confirmAppointment(appt.requestID)}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full text-xs shadow transition duration-150"
                       >
                         Confirm
                       </button>
                     )}
 
-                    {/* Cancel */}
                     <button
-                      onClick={() => cancelAppointment(appt.id)}
+                      onClick={() => cancelAppointment(appt.requestID)}
                       className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs shadow transition duration-150"
                     >
                       Cancel

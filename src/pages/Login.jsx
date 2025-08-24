@@ -35,14 +35,22 @@ const Login = () => {
       }
 
       const decoded = decodeToken(token);
-const finalUser = {
-  ...user,
-  role: (user.role || decoded?.role)?.toLowerCase(), // ✅ convert role to lowercase
-  FullName: user.FullName || decoded?.FullName,
-};
+      const finalUser = {
+        ...user,
+        role: (user.role || decoded?.role)?.toLowerCase(),
+        FullName: user.FullName || decoded?.FullName,
+      };
 
-
+      // ✅ Save token, role, and correct IDs in localStorage
       localStorage.setItem("token", token);
+      localStorage.setItem("role", finalUser.role);
+
+      if (finalUser.role === "counselor") {
+        localStorage.setItem("counselorId", finalUser.userId);
+      } else if (finalUser.role === "user") {
+        localStorage.setItem("userId", finalUser.userId);
+      }
+
       setUser(finalUser);
 
       await Swal.fire({
@@ -53,14 +61,14 @@ const finalUser = {
         confirmButtonText: "OK",
       });
 
+      // Redirect based on role
       if (finalUser.role === "counselor") {
-  navigate("/counselor/booked", { replace: true });
-} else if (finalUser.role === "user") {
-  navigate("/dashboard", { replace: true });
-} else {
-  navigate("/", { replace: true });
-}
-
+        navigate("/counselor/booked", { replace: true });
+      } else if (finalUser.role === "user") {
+        navigate("/dashboard", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
     } catch (error) {
       console.error("Login error:", error.response?.data || error.message);
       Swal.fire({

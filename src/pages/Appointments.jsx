@@ -10,7 +10,7 @@ const AppointmentPage = () => {
   const scrollRef = useRef(null);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedCounselor, setSelectedCounselor] = useState(null); // store full counselor object
+  const [selectedCounselor, setSelectedCounselor] = useState(null);
   const [action, setAction] = useState('Booking');
   const [startTime, setStartTime] = useState('');
   const [startAmPm, setStartAmPm] = useState('');
@@ -25,7 +25,6 @@ const AppointmentPage = () => {
     '05:00', '05:30',
   ];
 
-  // Map weekday names -> JS day index
   const weekdayMap = {
     Sunday: 0,
     Monday: 1,
@@ -36,7 +35,6 @@ const AppointmentPage = () => {
     Saturday: 6,
   };
 
-  // Fetch counselors from backend
   useEffect(() => {
     axios.get('https://localhost:5001/api/Counselors')
       .then(res => {
@@ -48,7 +46,7 @@ const AppointmentPage = () => {
           profileName: c.profileName,
           description: c.description,
           imageUrl: c.imageUrl || '/images/c1.jpeg',
-          availabilityDays: c.availabilityDays, // e.g. "Friday,Sunday"
+          availabilityDays: c.availabilityDays,
         }));
         setCounselors(mapped);
       })
@@ -64,7 +62,7 @@ const AppointmentPage = () => {
   };
 
   const handleCounselorSelect = (counselor) => {
-    setSelectedCounselor(counselor); // store the full counselor object
+    setSelectedCounselor(counselor);
     setStartTime('');
     setStartAmPm('');
     setEndTime('');
@@ -78,6 +76,7 @@ const AppointmentPage = () => {
   const handleActionChange = (actionType) => {
     setAction(actionType);
     if (actionType === 'Booking') navigate('/booked');
+    if (actionType === 'Requested') navigate('/requested');
     else if (actionType === 'Cancelling') navigate('/cancelled');
   };
 
@@ -93,7 +92,6 @@ const AppointmentPage = () => {
   const scrollLeft = () => scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
   const scrollRight = () => scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
 
-  // Convert availability string -> weekday indices
   const availableDays = selectedCounselor?.availabilityDays
     ?.split(',')
     .map(day => weekdayMap[day.trim()]);
@@ -110,10 +108,16 @@ const AppointmentPage = () => {
         </p>
         <div className="flex flex-wrap gap-2">
           <button
+            onClick={() => handleActionChange('Requested')}
+            className="px-3 py-1.5 bg-yellow-300 text-white rounded hover:bg-yellow-600 text-sm transition"
+          >
+            Requested Bookings
+          </button>
+          <button
             onClick={() => handleActionChange('Booking')}
             className="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 text-sm transition"
           >
-            Bookings
+            Confirmed Bookings
           </button>
           <button
             onClick={() => handleActionChange('Cancelling')}
@@ -178,14 +182,13 @@ const AppointmentPage = () => {
         <p className="text-center text-teal-600 font-medium text-base">
           Selected Counselor: {selectedCounselor.fullName}
         </p>
-        
       )}
 
       <div className="bg-gray-50 p-4 rounded-lg shadow space-y-3">
         <p className="text-base font-semibold text-gray-700">
           Availability of{' '}
-          <span className="text-teal-600">{selectedCounselor?.fullName || '---'}</span> 
-       <span className="text-slate-400" > | *** Available days are highlighted in green on the calendar for easy identification.***|</span> 
+          <span className="text-teal-600">{selectedCounselor?.fullName || '---'}</span>
+          <span className="text-slate-400"> | *** Available days are highlighted in green on the calendar for easy identification.***|</span>
         </p>
         <div className="flex justify-center mt-2 mb-2">
           <div className="p-2 bg-white rounded-md shadow-sm scale-90 sm:scale-90 md:scale-75 lg:scale-75">
@@ -277,12 +280,40 @@ const AppointmentPage = () => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 pt-3">
+          {/* Updated Ready to book button */}
           <button
-            onClick={() => navigate('/booking')}
+            onClick={() => {
+              if (!selectedCounselor || !startTime || !startAmPm || !endTime || !endAmPm) {
+                alert("Please select counselor, date, start and end time.");
+                return;
+              }
+
+              const parseTimeTo24h = (time, ampm) => {
+                let [h, m] = time.split(':').map(Number);
+                if (ampm === 'PM' && h < 12) h += 12;
+                if (ampm === 'AM' && h === 12) h = 0;
+                return { h, m };
+              };
+
+              const start = parseTimeTo24h(startTime, startAmPm);
+              const end = parseTimeTo24h(endTime, endAmPm);
+
+              const bookingPayload = {
+                counselorId: selectedCounselor.counselorID,
+                counselorName: selectedCounselor.fullName,
+                date: selectedDate.toISOString(),
+                startTime: `${start.h.toString().padStart(2,'0')}:${start.m.toString().padStart(2,'0')}`,
+                endTime: `${end.h.toString().padStart(2,'0')}:${end.m.toString().padStart(2,'0')}`,
+              };
+
+              sessionStorage.setItem('pendingBooking', JSON.stringify(bookingPayload));
+              navigate('/booking');
+            }}
             className="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 text-sm transition"
           >
             Ready to book
           </button>
+
           <button
             onClick={handleCancel}
             className="px-3 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 text-sm transition"

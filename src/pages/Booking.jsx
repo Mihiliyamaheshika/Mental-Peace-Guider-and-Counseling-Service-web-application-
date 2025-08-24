@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import Swal from 'sweetalert2'; // ✅ Import SweetAlert2
+import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const Booking = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const Booking = () => {
     reason: '',
   });
 
+  const [bookingInfo, setBookingInfo] = useState(null);
   const [errors, setErrors] = useState({});
 
   const countries = [
@@ -28,6 +30,13 @@ const Booking = () => {
     'France': '+33',
   };
 
+  useEffect(() => {
+    const pendingBooking = sessionStorage.getItem('pendingBooking');
+    if (pendingBooking) {
+      setBookingInfo(JSON.parse(pendingBooking));
+    }
+  }, []);
+
   const validate = () => {
     const newErrors = {};
     if (!formData.country) newErrors.country = 'Required';
@@ -43,33 +52,75 @@ const Booking = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (name === 'country') {
       const code = countryCodes[value] || '';
-      setFormData((prev) => ({
-        ...prev,
-        country: value,
-        phone: code,
-      }));
-      setErrors((prevErrors) => ({ ...prevErrors, country: '', phone: '' }));
+      setFormData(prev => ({ ...prev, country: value, phone: code }));
+      setErrors(prevErrors => ({ ...prevErrors, country: '', phone: '' }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+      setFormData(prev => ({ ...prev, [name]: value }));
+      setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      console.log('Booking:', formData);
 
-      // ✅ SweetAlert2 success dialog
+    if (!bookingInfo) {
+      Swal.fire({
+        icon: 'error',
+        title: 'No Counselor Selected',
+        text: 'Please select a counselor and time before booking.',
+        confirmButtonText: 'OK',
+      });
+      return;
+    }
+
+    if (!validate()) return;
+
+    // Parse startTime safely
+    let hours = 0;
+    let minutes = 0;
+    const timeParts = bookingInfo.startTime.split(':');
+    if (timeParts.length >= 2) {
+      hours = parseInt(timeParts[0], 10);
+      const minPart = timeParts[1].split(' ')[0];
+      minutes = parseInt(minPart, 10);
+
+      const modifier = bookingInfo.startTime.split(' ')[1]; // AM/PM or undefined
+      if (modifier) {
+        if (modifier.toUpperCase() === 'PM' && hours < 12) hours += 12;
+        if (modifier.toUpperCase() === 'AM' && hours === 12) hours = 0;
+      }
+    }
+
+   const selectedDate = new Date(bookingInfo.date);
+selectedDate.setHours(hours, minutes, 0, 0);
+
+// Convert to local ISO string without timezone shift
+const pad = (num) => String(num).padStart(2, '0');
+const localISO = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 1)}-${pad(selectedDate.getDate())}T${pad(selectedDate.getHours())}:${pad(selectedDate.getMinutes())}:00`;
+
+// ✅ Get logged-in userId from localStorage
+    const userId = localStorage.getItem("userId");
+
+    const finalBooking = {
+      userID: userId ? parseInt(userId, 10) : null,
+      counselorID: bookingInfo.counselorId,
+      requestedDateTime: localISO, // send as local time ISO
+      message: formData.reason || 'No reason provided',
+      status: 'Requested',
+    };
+
+
+    try {
+      await axios.post('https://localhost:5001/api/BookingRequests', finalBooking);
+
       Swal.fire({
         icon: 'success',
         title: 'Request Sent!',
-        text: 'Your request has been sent to the counselor.',
+        text: 'Your booking request has been sent to the counselor.',
         confirmButtonText: 'OK',
-        confirmButtonColor: '#14b8a6', // teal-600
+        confirmButtonColor: '#14b8a6',
       });
 
       setFormData({
@@ -80,6 +131,16 @@ const Booking = () => {
         email: '',
         reason: '',
       });
+      setBookingInfo(null);
+      sessionStorage.removeItem('pendingBooking');
+    } catch (error) {
+      console.error('Error submitting booking:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Booking Failed',
+        text: 'Something went wrong while sending your booking request.',
+        confirmButtonText: 'OK',
+      });
     }
   };
 
@@ -87,11 +148,15 @@ const Booking = () => {
     <div className="max-w-md mx-auto p-3 bg-white shadow rounded-lg mt-6 text-sm">
       <h2 className="text-xl font-semibold text-center text-teal-700 mb-3">Book Counseling</h2>
 
-
-
+      {bookingInfo && (
+        <div className="mb-3 p-2 bg-green-50 border border-green-200 rounded text-sm">
+          <p><span className="font-semibold">Counselor:</span> {bookingInfo.counselorName}</p>
+          <p><span className="font-semibold">Date:</span> {new Date(bookingInfo.date).toDateString()}</p>
+          <p><span className="font-semibold">Time:</span> {bookingInfo.startTime} - {bookingInfo.endTime}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-3">
-        {/* Country */}
         <div>
           <label className="block mb-1">Country</label>
           <select
@@ -101,14 +166,11 @@ const Booking = () => {
             className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
           >
             <option value="">Select country</option>
-            {countries.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
+            {countries.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
           {errors.country && <p className="text-red-500 text-xs">{errors.country}</p>}
         </div>
 
-        {/* Name */}
         <div>
           <label className="block mb-1">Full Name</label>
           <input
@@ -122,7 +184,6 @@ const Booking = () => {
           {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
         </div>
 
-        {/* Phone */}
         <div>
           <label className="block mb-1">Phone</label>
           <input
@@ -136,7 +197,6 @@ const Booking = () => {
           {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
         </div>
 
-        {/* NIC */}
         <div>
           <label className="block mb-1">NIC</label>
           <input
@@ -150,7 +210,6 @@ const Booking = () => {
           {errors.nic && <p className="text-red-500 text-xs">{errors.nic}</p>}
         </div>
 
-        {/* Email */}
         <div>
           <label className="block mb-1">Email</label>
           <input
@@ -164,7 +223,6 @@ const Booking = () => {
           {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
         </div>
 
-        {/* Reason */}
         <div>
           <label className="block mb-1">Reason (Optional)</label>
           <textarea
@@ -177,11 +235,10 @@ const Booking = () => {
           ></textarea>
         </div>
 
-{/* Professional Reminder */}
-<p className="text-sm text-gray-600 text-center mb-4">
-  Please ensure that you complete the payment <span className="font-semibold">once your booking is confirmed by the counselor</span> to secure your appointment.
-</p>
-        {/* Submit */}
+        <p className="text-sm text-gray-600 text-center mb-4">
+          Please ensure that you complete the payment <span className="font-semibold">once your booking is confirmed by the counselor</span> to secure your appointment.
+        </p>
+
         <div className="text-center pt-1">
           <button
             type="submit"

@@ -15,6 +15,7 @@ import Child from "./pages/child";
 import Career from "./pages/career";
 import Education from "./pages/education";
 import Booked from "./pages/Booked";
+import Requested from "./pages/Requested";
 import Cancelled from "./pages/cancelled";
 import Dashboard from "./pages/dashboard";
 import CounselorProfile from "./pages/CounselorProfile";
@@ -68,6 +69,7 @@ function App() {
           <Route path="/booking" element={<ProtectedRoute role="user"><Booking /></ProtectedRoute>} />
           <Route path="/appointments" element={<ProtectedRoute role="user"><Appointments /></ProtectedRoute>} />
           <Route path="/booked" element={<ProtectedRoute role="user"><Booked /></ProtectedRoute>} />
+           <Route path="/requested" element={<ProtectedRoute role="user"><Requested /></ProtectedRoute>} />
           <Route path="/cancelled" element={<ProtectedRoute role="user"><Cancelled /></ProtectedRoute>} />
           <Route path="/payment/:sessionId" element={<ProtectedRoute role="user"><Payment /></ProtectedRoute>} />
           <Route path="/paymentcancel" element={<ProtectedRoute role="user"><PaymentCancel /></ProtectedRoute>} />
