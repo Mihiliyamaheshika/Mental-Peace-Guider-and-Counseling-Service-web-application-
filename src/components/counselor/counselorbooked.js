@@ -33,12 +33,33 @@ const CounselorBooked = () => {
     fetchAppointments();
   }, [counselorId]);
 
-  const confirmAppointment = (id) => {
-    setAppointments(prev =>
-      prev.map(appt =>
-        appt.requestID === id ? { ...appt, confirmed: true } : appt
-      )
-    );
+  // ✅ Updated confirm function to call POST /api/Bookings
+  const confirmAppointment = async (appt) => {
+    try {
+      // Create booking in backend
+      const payload = {
+        requestID: appt.requestID,
+        userID: appt.userID,
+        counselorID: appt.counselorID,
+        scheduledDateTime: appt.requestedDateTime,
+        videoCallLink: appt.videoCallLink || '',
+        status: 'Confirmed',
+        isPaid: false,
+        paymentReference: null
+      };
+
+      const response = await axios.post('https://localhost:5001/api/Bookings', payload);
+      console.log(response.data);
+
+      // Update local state
+      setAppointments(prev =>
+        prev.map(a =>
+          a.requestID === appt.requestID ? { ...a, confirmed: true, status: 'Confirmed' } : a
+        )
+      );
+    } catch (error) {
+      console.error('Error confirming booking:', error);
+    }
   };
 
   const cancelAppointment = (id) => {
@@ -102,7 +123,7 @@ const CounselorBooked = () => {
 
                     {!appt.confirmed && (
                       <button
-                        onClick={() => confirmAppointment(appt.requestID)}
+                        onClick={() => confirmAppointment(appt)}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full text-xs shadow transition duration-150"
                       >
                         Confirm
