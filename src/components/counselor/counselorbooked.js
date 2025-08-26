@@ -3,40 +3,40 @@ import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 
 const CounselorBooked = () => {
-  const { user } = useContext(AuthContext); // get logged-in user from context
+  const { user } = useContext(AuthContext);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Get counselorId from context or fallback to localStorage
-  const counselorId = Number(user?.CounselorId || user?.counselorId || localStorage.getItem('counselorId'));
+  const counselorId = Number(
+    user?.CounselorId || user?.counselorId || localStorage.getItem('counselorId')
+  );
+
+  // ✅ Fetch appointments helper
+  const fetchAppointments = async () => {
+    if (!counselorId) {
+      console.warn('Counselor ID is missing! Waiting for login or localStorage...');
+      setLoading(false);
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `https://localhost:5001/api/BookingRequests/counselor/${counselorId}`
+      );
+      setAppointments(response.data);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      if (!counselorId) {
-        console.warn('Counselor ID is missing! Waiting for login or localStorage...');
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await axios.get(
-          `https://localhost:5001/api/BookingRequests/counselor/${counselorId}`
-        );
-        setAppointments(response.data);
-      } catch (error) {
-        console.error('Error fetching bookings:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAppointments();
   }, [counselorId]);
 
-  // ✅ Updated confirm function to call POST /api/Bookings
   const confirmAppointment = async (appt) => {
     try {
-      // Create booking in backend
+      // Step 1: Insert into Bookings
       const payload = {
         requestID: appt.requestID,
         userID: appt.userID,
@@ -45,25 +45,27 @@ const CounselorBooked = () => {
         videoCallLink: appt.videoCallLink || '',
         status: 'Confirmed',
         isPaid: false,
-        paymentReference: null
+        paymentReference: null,
       };
 
-      const response = await axios.post('https://localhost:5001/api/Bookings', payload);
-      console.log(response.data);
+      await axios.post('https://localhost:5001/api/Bookings', payload);
 
-      // Update local state
-      setAppointments(prev =>
-        prev.map(a =>
-          a.requestID === appt.requestID ? { ...a, confirmed: true, status: 'Confirmed' } : a
-        )
+      // Step 2: Update BookingRequests status
+      await axios.put(
+        `https://localhost:5001/api/BookingRequests/${appt.requestID}/status`,
+        JSON.stringify('Confirmed'),
+        { headers: { 'Content-Type': 'application/json' } }
       );
+
+      // Step 3: Refresh list from backend so state is always correct
+      fetchAppointments();
     } catch (error) {
       console.error('Error confirming booking:', error);
     }
   };
 
   const cancelAppointment = (id) => {
-    setAppointments(prev => prev.filter(appt => appt.requestID !== id));
+    setAppointments((prev) => prev.filter((appt) => appt.requestID !== id));
   };
 
   const formatTime = (isoString) => {
@@ -101,27 +103,40 @@ const CounselorBooked = () => {
           </thead>
 
           <tbody className="divide-y divide-gray-100">
-            {appointments.map(appt => (
-              <tr key={appt.requestID} className="hover:bg-gray-50 transition-colors duration-150">
-                <td className="px-4 py-2 text-gray-800 font-medium">{appt.userName || '-'}</td>
-                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{formatDate(appt.requestedDateTime)}</td>
-                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{formatTime(appt.requestedDateTime)}</td>
-                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{formatTime(appt.endDateTime)}</td>
-                <td className="px-4 py-2 text-center font-medium">{appt.status || '-'}</td>
+            {appointments.map((appt) => (
+              <tr
+                key={appt.requestID}
+                className="hover:bg-gray-50 transition-colors duration-150"
+              >
+                <td className="px-4 py-2 text-gray-800 font-medium">
+                  {appt.userName || '-'}
+                </td>
+                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
+                  {formatDate(appt.requestedDateTime)}
+                </td>
+                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
+                  {formatTime(appt.requestedDateTime)}
+                </td>
+                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
+                  {formatTime(appt.endDateTime)}
+                </td>
+                <td className="px-4 py-2 text-center font-medium">
+                  {appt.status || '-'}
+                </td>
                 <td className="px-4 py-2">
                   <div className="flex justify-center space-x-2 whitespace-nowrap">
                     <button
                       className={`px-3 py-1 rounded-full text-xs shadow transition duration-150 ${
-                        appt.confirmed && appt.paid
+                        appt.status === 'Confirmed' && appt.isPaid
                           ? 'bg-green-600 hover:bg-green-700 text-white'
                           : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                       }`}
-                      disabled={!appt.confirmed || !appt.paid}
+                      disabled={appt.status !== 'Confirmed' || !appt.isPaid}
                     >
                       To Session
                     </button>
 
-                    {!appt.confirmed && (
+                    {appt.status !== 'Confirmed' && (
                       <button
                         onClick={() => confirmAppointment(appt)}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full text-xs shadow transition duration-150"

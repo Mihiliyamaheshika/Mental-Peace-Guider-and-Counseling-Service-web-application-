@@ -1,110 +1,84 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-const Payment = () => {
+const PaymentButton = () => {
   const [sdkReady, setSdkReady] = useState(false);
-  const bookingAmount = 1000;
-  const counselorFee = 1500;
-  const totalAmount = bookingAmount + counselorFee;
+  const navigate = useNavigate();
 
-  // Load PayHere SDK
   useEffect(() => {
-    const script = document.createElement("script");
-    // Use the correct live SDK URL for both sandbox & production
-    script.src = "https://www.payhere.lk/lib/payhere.js";
-    script.async = true;
+    // Simulate SDK ready (since you're using direct PayHere link, no need for real SDK)
+    setTimeout(() => setSdkReady(true), 1000);
 
-    script.onload = () => {
-      if (window.payhere) {
-        setSdkReady(true);
-      } else {
-        console.error("PayHere SDK failed to load.");
-      }
-    };
+    // Check if returning from PayHere with success
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get("status"); // example: ?status=success
 
-    script.onerror = () => {
-      console.error("Failed to load PayHere SDK.");
-      alert("Failed to load PayHere SDK. Please check your internet connection.");
-    };
-
-    document.body.appendChild(script);
-
-    // Cleanup on unmount
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  const handlePayment = () => {
-    if (!window.payhere || !sdkReady) {
-      alert("Payment gateway is still loading. Please wait a moment.");
-      return;
+    if (status === "success") {
+      navigate("/booked"); // ✅ Navigate to Booked.jsx
     }
-
-    const payment = {
-      sandbox: true, // Set to true to use sandbox mode
-      merchant_id: "1231360", // Your sandbox Merchant ID (replace if needed)
-      return_url: "http://localhost:3000/payment-success",
-      cancel_url: "http://localhost:3000/payment-cancel",
-      notify_url: "http://localhost:3000/payment-notify",
-
-      order_id: "APPT001",
-      items: "Counseling Appointment",
-      amount: totalAmount,
-      currency: "LKR",
-      first_name: "Test",
-      last_name: "User",
-      email: "testuser@example.com",
-      phone: "0771234567",
-      address: "Colombo",
-      city: "Colombo",
-      country: "Sri Lanka",
-    };
-
-    window.payhere.startPayment(payment);
-  };
+  }, [navigate]);
 
   return (
     <div
       style={{
-        maxWidth: "500px",
-        margin: "50px auto",
-        padding: "30px",
-        borderRadius: "12px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        backgroundColor: "#ffffff",
+        maxWidth: "400px",
+        margin: "20px auto",
+        padding: "20px",
+        border: "1px solid #ddd",
+        borderRadius: "10px",
+        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
       }}
     >
-      <h2 style={{ textAlign: "center", marginBottom: "30px", color: "#2c3e50" }}>
-        Appointment Payment Summary
+      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+        Counseling Appointment Payment
       </h2>
 
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "15px", fontSize: "16px" }}>
-        <span>Booking Amount</span>
-        <span>LKR {bookingAmount.toFixed(2)}</span>
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "15px", fontSize: "16px" }}>
-        <span>Counselor Fee</span>
-        <span>LKR {counselorFee.toFixed(2)}</span>
-      </div>
-
-      <hr style={{ margin: "20px 0", border: "0", borderTop: "1px solid #ccc" }} />
-
+      {/* Bill Section */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "25px",
-          fontWeight: "bold",
-          fontSize: "18px",
-          color: "#34495e",
+          marginBottom: "20px",
+          padding: "15px",
+          backgroundColor: "#f9f9f9",
+          borderRadius: "8px",
+          border: "1px solid #eee",
         }}
       >
-        <span>Total Amount</span>
-        <span>LKR {totalAmount.toFixed(2)}</span>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "8px",
+          }}
+        >
+          <span>Counselor Fee</span>
+          <span>1500.00 LKR</span>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "8px",
+          }}
+        >
+          <span>Booking Fee</span>
+          <span>1000.00 LKR</span>
+        </div>
+        <hr />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontWeight: "bold",
+            fontSize: "16px",
+            marginTop: "10px",
+          }}
+        >
+          <span>Total</span>
+          <span>2500.00 LKR</span>
+        </div>
       </div>
 
+      {/* Payment Button */}
       <button
         style={{
           width: "100%",
@@ -118,13 +92,18 @@ const Payment = () => {
           cursor: sdkReady ? "pointer" : "not-allowed",
           transition: "background-color 0.3s",
         }}
-        onClick={handlePayment}
+        onClick={() => {
+          // Redirect directly to PayHere sandbox link with return URL
+          window.location.href =
+            "https://sandbox.payhere.lk/pay/o19d1e737?status=success"; 
+          //  Add return params so after payment you can catch it in useEffect
+        }}
         disabled={!sdkReady}
       >
-        {sdkReady ? "Ready to Pay" : "Loading Payment Gateway..."}
+        {sdkReady ? "Pay Now" : "Loading Payment Gateway..."}
       </button>
     </div>
   );
 };
 
-export default Payment;
+export default PaymentButton;
