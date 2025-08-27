@@ -102,27 +102,31 @@ const Booked = () => {
                   <div className="flex justify-center space-x-2 whitespace-nowrap">
                     <button
                       onClick={() => handlePayment(session.bookingID)}
-                      className={`px-4 py-1 rounded-full text-xs shadow transition duration-150 ${
-                        session.isPaid
+                      className={`px-4 py-1 rounded-full text-xs shadow transition duration-150 ${session.isPaid
                           ? 'bg-green-500 hover:bg-green-600 text-white'
                           : 'bg-blue-500 hover:bg-blue-600 text-white'
-                      }`}
+                        }`}
                     >
                       {session.isPaid ? 'Paid' : 'Do payment'}
                     </button>
 
-                    {/* ✅ To-Session button */}
                     <button
-                      className={`px-4 py-1 rounded-full text-xs shadow transition duration-150 ${
-                        session.isPaid
-                          ? 'bg-purple-400 hover:bg-purple-500 text-white'
-                          : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                      }`}
+                      onClick={() => {
+                        if (session.videoCallLink) {
+                          window.open(session.videoCallLink, "_blank");
+                        } else {
+                          alert("Session link not available yet.");
+                        }
+                      }}
                       disabled={!session.isPaid}
-                      onClick={() => navigate(`/session/${session.bookingID}`)}
+                      className={`px-4 py-1 rounded-full text-xs shadow transition duration-150 ${session.isPaid
+                          ? 'bg-purple-500 hover:bg-purple-600 text-white'
+                          : 'bg-gray-300 text-gray-700 cursor-not-allowed'
+                        }`}
                     >
                       To Session
                     </button>
+
 
                     <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-full text-xs shadow transition duration-150">
                       Cancel

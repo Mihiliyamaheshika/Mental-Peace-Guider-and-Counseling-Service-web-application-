@@ -36,7 +36,6 @@ const CounselorBooked = () => {
 
   const confirmAppointment = async (appt) => {
     try {
-      // Step 1: Insert into Bookings
       const payload = {
         requestID: appt.requestID,
         userID: appt.userID,
@@ -50,14 +49,12 @@ const CounselorBooked = () => {
 
       await axios.post('https://localhost:5001/api/Bookings', payload);
 
-      // Step 2: Update BookingRequests status
       await axios.put(
         `https://localhost:5001/api/BookingRequests/${appt.requestID}/status`,
         JSON.stringify('Confirmed'),
         { headers: { 'Content-Type': 'application/json' } }
       );
 
-      // Step 3: Refresh list from backend so state is always correct
       fetchAppointments();
     } catch (error) {
       console.error('Error confirming booking:', error);
@@ -78,6 +75,23 @@ const CounselorBooked = () => {
     if (!isoString) return '-';
     const date = new Date(isoString);
     return date.toLocaleDateString();
+  };
+
+  // Open session dynamically using requestID
+  const joinSession = async (requestID) => {
+    try {
+      const res = await axios.get(`https://localhost:5001/api/Bookings/videoLink/${requestID}`);
+      const link = res.data?.videoCallLink;
+
+      if (link) {
+        window.open(link, "_blank");
+      } else {
+        alert("Session link not available yet.");
+      }
+    } catch (err) {
+      console.error("Failed to fetch video link:", err);
+      alert("Error fetching session link.");
+    }
   };
 
   if (loading) return <div className="p-6">Loading appointments...</div>;
@@ -104,37 +118,25 @@ const CounselorBooked = () => {
 
           <tbody className="divide-y divide-gray-100">
             {appointments.map((appt) => (
-              <tr
-                key={appt.requestID}
-                className="hover:bg-gray-50 transition-colors duration-150"
-              >
-                <td className="px-4 py-2 text-gray-800 font-medium">
-                  {appt.userName || '-'}
-                </td>
-                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
-                  {formatDate(appt.requestedDateTime)}
-                </td>
-                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
-                  {formatTime(appt.requestedDateTime)}
-                </td>
-                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
-                  {formatTime(appt.endDateTime)}
-                </td>
-                <td className="px-4 py-2 text-center font-medium">
-                  {appt.status || '-'}
-                </td>
+              <tr key={appt.requestID} className="hover:bg-gray-50 transition-colors duration-150">
+                <td className="px-4 py-2 text-gray-800 font-medium">{appt.userName || '-'}</td>
+                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{formatDate(appt.requestedDateTime)}</td>
+                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{formatTime(appt.requestedDateTime)}</td>
+                <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{formatTime(appt.endDateTime)}</td>
+                <td className="px-4 py-2 text-center font-medium">{appt.status || '-'}</td>
                 <td className="px-4 py-2">
                   <div className="flex justify-center space-x-2 whitespace-nowrap">
                     <button
-                      className={`px-3 py-1 rounded-full text-xs shadow transition duration-150 ${
-                        appt.status === 'Confirmed' && appt.isPaid
-                          ? 'bg-green-600 hover:bg-green-700 text-white'
+                      onClick={() => joinSession(appt.requestID)}
+                      className={`px-3 py-1 rounded-full text-xs shadow transition duration-150 ${appt.status === 'Confirmed' 
+                          ? 'bg-green-400 hover:bg-green-700 text-white'
                           : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      }`}
-                      disabled={appt.status !== 'Confirmed' || !appt.isPaid}
+                        }`}
+                      disabled={!(appt.status === 'Confirmed')}
                     >
                       To Session
                     </button>
+
 
                     {appt.status !== 'Confirmed' && (
                       <button
