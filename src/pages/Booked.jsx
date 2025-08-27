@@ -7,7 +7,6 @@ const Booked = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Get logged-in user ID from localStorage
   const loggedInUserID = localStorage.getItem('userId');
 
   useEffect(() => {
@@ -34,27 +33,40 @@ const Booked = () => {
     fetchBookings();
   }, [loggedInUserID]);
 
-  const goToPayment = (id) => {
-    navigate(`/payment/${id}`);
+  const handlePayment = async (bookingID) => {
+    navigate(`/payment/${bookingID}`);
+
+    try {
+      await axios.put(
+        `https://localhost:5001/api/Bookings/${bookingID}/pay`,
+        "Paid",
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.bookingID === bookingID ? { ...s, isPaid: true } : s
+        )
+      );
+    } catch (err) {
+      console.error("Failed to mark booking as Paid:", err);
+    }
   };
 
   const formatDate = (isoString) => {
     if (!isoString) return '-';
-    const date = new Date(isoString);
-    return date.toLocaleDateString();
+    return new Date(isoString).toLocaleDateString();
   };
 
   const formatTime = (isoString) => {
     if (!isoString) return '-';
-    const date = new Date(isoString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  // ✅ Calculate end time as 2 hours after start
   const getEndTime = (isoString) => {
     if (!isoString) return '-';
     const date = new Date(isoString);
-    date.setHours(date.getHours() + 2); // add 2 hours
+    date.setHours(date.getHours() + 2);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
@@ -88,27 +100,30 @@ const Booked = () => {
                 <td className="px-6 py-2 text-gray-700 whitespace-nowrap">{getEndTime(session.scheduledDateTime)}</td>
                 <td className="px-6 py-2">
                   <div className="flex justify-center space-x-2 whitespace-nowrap">
-                    {!session.isPaid && (
-                      <button
-                        onClick={() => goToPayment(session.bookingID)}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded-full text-xs shadow transition duration-150"
-                      >
-                        Do payment
-                      </button>
-                    )}
                     <button
+                      onClick={() => handlePayment(session.bookingID)}
                       className={`px-4 py-1 rounded-full text-xs shadow transition duration-150 ${
                         session.isPaid
                           ? 'bg-green-500 hover:bg-green-600 text-white'
+                          : 'bg-blue-500 hover:bg-blue-600 text-white'
+                      }`}
+                    >
+                      {session.isPaid ? 'Paid' : 'Do payment'}
+                    </button>
+
+                    {/* ✅ To-Session button */}
+                    <button
+                      className={`px-4 py-1 rounded-full text-xs shadow transition duration-150 ${
+                        session.isPaid
+                          ? 'bg-purple-400 hover:bg-purple-500 text-white'
                           : 'bg-gray-300 text-gray-600 cursor-not-allowed'
                       }`}
                       disabled={!session.isPaid}
+                      onClick={() => navigate(`/session/${session.bookingID}`)}
                     >
                       To Session
                     </button>
-                    <button className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded-full text-xs shadow transition duration-150">
-                      Reschedule
-                    </button>
+
                     <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-full text-xs shadow transition duration-150">
                       Cancel
                     </button>

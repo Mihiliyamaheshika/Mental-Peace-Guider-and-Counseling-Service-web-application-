@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { registerCounselor } from "../services/authService";
 import axios from "axios";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dlyzgligk/upload";
 const UPLOAD_PRESET = "Counselor-image";
@@ -69,7 +71,14 @@ const CounselorSignUp = () => {
       // Call API to signup counselor
       await registerCounselor(payload);
 
-      alert("Counselor registered successfully!");
+      //alert("Counselor registered successfully!");
+       Swal.fire({
+        title: "Success!",
+        text: "Counselor registered successfully!",
+        icon: "success",
+        confirmButtonColor: "#2563eb"
+      });
+
 
       // Clear form
       setTitle(""); setName(""); setGender(""); setEmail(""); setPassword("");
@@ -80,11 +89,26 @@ const CounselorSignUp = () => {
 
       if (data?.errors) {
         const messages = Object.values(data.errors).flat().join("\n");
-        alert(`Registration failed:\n${messages}`);
+        Swal.fire({
+          title: "Registration Failed",
+          text: messages,
+          icon: "error",
+          confirmButtonColor: "#d33"
+        });
       } else if (data?.title) {
-        alert(`Registration failed: ${data.title}`);
+        Swal.fire({
+          title: "Registration Failed",
+          text: data.title,
+          icon: "error",
+          confirmButtonColor: "#d33"
+        });
       } else {
-        alert(error?.message || "Registration failed. Please try again.");
+        Swal.fire({
+          title: "Registration Failed",
+          text: error?.message || "Please try again.",
+          icon: "error",
+          confirmButtonColor: "#d33"
+        });
       }
     } finally {
       setLoading(false);
