@@ -3,7 +3,7 @@ import { PhoneCall } from "lucide-react";
 
 const Immediate = () => {
   // counselors' WhatsApp numbers 
-  const counselors = ["94775953096"];
+  const counselors = ["94717543852"];
 
   const handleEmergencyChat = () => {
     // Pick a random counselor from  list
