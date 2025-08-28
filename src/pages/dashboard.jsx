@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext"; // Use JWT user info from login
+import { AuthContext } from "../context/AuthContext"; //JWT user info from login
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext); // Get logged-in user info from context
+  const { user } = useContext(AuthContext); // Get logged-in user 
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    // Redirect if user is not logged in or role is not "user"
+
     if (!user) {
       navigate("/login"); // not logged in
     } else if (user.role !== "user") {

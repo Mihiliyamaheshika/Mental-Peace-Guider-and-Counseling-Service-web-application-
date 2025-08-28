@@ -7,8 +7,6 @@ const Booking = () => {
     country: '',
     name: '',
     phone: '',
-    nic: '',
-    email: '',
     reason: '',
   });
 
@@ -32,9 +30,7 @@ const Booking = () => {
 
   useEffect(() => {
     const pendingBooking = sessionStorage.getItem('pendingBooking');
-    if (pendingBooking) {
-      setBookingInfo(JSON.parse(pendingBooking));
-    }
+    if (pendingBooking) setBookingInfo(JSON.parse(pendingBooking));
   }, []);
 
   const validate = () => {
@@ -43,19 +39,29 @@ const Booking = () => {
     if (!formData.name || formData.name.length < 3) newErrors.name = 'Min 3 characters';
     const phoneRegex = /^[+\d][\d]{8,14}$/;
     if (!phoneRegex.test(formData.phone)) newErrors.phone = 'Invalid phone';
-    if (!formData.nic || formData.nic.length < 10) newErrors.nic = 'Min 10 characters';
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) newErrors.email = 'Invalid email';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     if (name === 'country') {
       const code = countryCodes[value] || '';
       setFormData(prev => ({ ...prev, country: value, phone: code }));
       setErrors(prevErrors => ({ ...prevErrors, country: '', phone: '' }));
+    } else if (name === 'phone') {
+
+      // Allow only numbers after the initial  selected countryCode
+      const countryCode = formData.country ? countryCodes[formData.country] : '';
+      let cleanedValue = value;
+      if (countryCode && value.startsWith(countryCode)) {
+        cleanedValue = countryCode + value.slice(countryCode.length).replace(/\D/g, '');
+      } else {
+        cleanedValue = value.replace(/\D/g, '');
+      }
+      setFormData(prev => ({ ...prev, phone: cleanedValue }));
+      setErrors(prevErrors => ({ ...prevErrors, phone: '' }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
       setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
@@ -77,7 +83,7 @@ const Booking = () => {
 
     if (!validate()) return;
 
-    // Parse startTime safely
+    // Parse start time to 24-hour format
     let hours = 0;
     let minutes = 0;
     const timeParts = bookingInfo.startTime.split(':');
@@ -86,31 +92,29 @@ const Booking = () => {
       const minPart = timeParts[1].split(' ')[0];
       minutes = parseInt(minPart, 10);
 
-      const modifier = bookingInfo.startTime.split(' ')[1]; // AM/PM or undefined
+      const modifier = bookingInfo.startTime.split(' ')[1];
       if (modifier) {
         if (modifier.toUpperCase() === 'PM' && hours < 12) hours += 12;
         if (modifier.toUpperCase() === 'AM' && hours === 12) hours = 0;
       }
     }
 
-   const selectedDate = new Date(bookingInfo.date);
-selectedDate.setHours(hours, minutes, 0, 0);
+    const selectedDate = new Date(bookingInfo.date);
+    selectedDate.setHours(hours, minutes, 0, 0);
 
-// Convert to local ISO string without timezone shift
-const pad = (num) => String(num).padStart(2, '0');
-const localISO = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 1)}-${pad(selectedDate.getDate())}T${pad(selectedDate.getHours())}:${pad(selectedDate.getMinutes())}:00`;
+    const pad = (num) => String(num).padStart(2, '0');
+    const localISO = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 1)}-${pad(selectedDate.getDate())}T${pad(selectedDate.getHours())}:${pad(selectedDate.getMinutes())}:00`;
 
-// ✅ Get logged-in userId from localStorage
+    // Get logged-in userId from localStorage
     const userId = localStorage.getItem("userId");
 
     const finalBooking = {
       userID: userId ? parseInt(userId, 10) : null,
       counselorID: bookingInfo.counselorId,
-      requestedDateTime: localISO, // send as local time ISO
+      requestedDateTime: localISO,
       message: formData.reason || 'No reason provided',
       status: 'Requested',
     };
-
 
     try {
       await axios.post('https://localhost:5001/api/BookingRequests', finalBooking);
@@ -127,8 +131,6 @@ const localISO = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 
         country: '',
         name: '',
         phone: '',
-        nic: '',
-        email: '',
         reason: '',
       });
       setBookingInfo(null);
@@ -195,32 +197,6 @@ const localISO = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 
             className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
           />
           {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
-        </div>
-
-        <div>
-          <label className="block mb-1">NIC</label>
-          <input
-            type="text"
-            name="nic"
-            value={formData.nic}
-            onChange={handleChange}
-            placeholder="1990XXXXXXXV"
-            className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-          />
-          {errors.nic && <p className="text-red-500 text-xs">{errors.nic}</p>}
-        </div>
-
-        <div>
-          <label className="block mb-1">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="you@example.com"
-            className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-          />
-          {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
         </div>
 
         <div>

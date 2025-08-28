@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// Base URL from environment variable or fallback
+// Base URL 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://localhost:5001";
 
 // Create Axios instance
@@ -49,7 +49,7 @@ API.interceptors.response.use(
 
 export default API;
 
-// --- Auth / Registration helper functions ---
+// Auth / Registration help
 
 // Register normal user
 export const registerUser = async ({ fullName, email, password, confirmPassword }) => {

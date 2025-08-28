@@ -53,26 +53,26 @@ const CounselorSignUp = () => {
         imageUrl = res.data.secure_url;
       }
 
-      // Prepare payload matching backend DTO
-   const payload = {
-  Title: title.trim() || "",
-  FullName: name.trim() || "",
-  Gender: gender || "",
-  Email: email.trim() || "",
-  Password: password.trim() || "",
-  ProfileName: name.trim() || "",
-  Description: description.trim() || "",
-  ImageUrl: imageUrl || "",
-  AvailabilityDays: availabilityDays.length > 0 ? availabilityDays.join(",") : ""
-};
+      // Payload matching backend DTO
+      const payload = {
+        Title: title.trim() || "",
+        FullName: name.trim() || "",
+        Gender: gender || "",
+        Email: email.trim() || "",
+        Password: password.trim() || "",
+        ProfileName: name.trim() || "",
+        Description: description.trim() || "",
+        ImageUrl: imageUrl || "",
+        AvailabilityDays: availabilityDays.length > 0 ? availabilityDays.join(",") : ""
+      };
 
       console.log("Payload being sent:", payload);
 
       // Call API to signup counselor
       await registerCounselor(payload);
 
-      //alert("Counselor registered successfully!");
-       Swal.fire({
+      //alert
+      Swal.fire({
         title: "Success!",
         text: "Counselor registered successfully!",
         icon: "success",

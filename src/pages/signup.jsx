@@ -2,14 +2,14 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
-import { registerUser } from "../services/API"; // use the updated API.js
+import { registerUser } from "../services/API";
 
 const SignUp = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
     try {
-      // Backend expects role, password, fullName, email
+
       const res = await registerUser({
         fullName: data.fullName,
         email: data.email,
@@ -25,7 +25,7 @@ const SignUp = () => {
         confirmButtonColor: "#3085d6",
         confirmButtonText: "OK",
       }).then(() => {
-        window.location.href = "/login"; // redirect to login page
+        window.location.href = "/login";
       });
 
     } catch (error) {

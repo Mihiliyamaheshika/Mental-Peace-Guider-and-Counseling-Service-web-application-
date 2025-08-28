@@ -6,7 +6,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Decode JWT manually
+  //  JWT manual decode
   const decodeToken = (token) => {
     try {
       const payload = token.split(".")[1];

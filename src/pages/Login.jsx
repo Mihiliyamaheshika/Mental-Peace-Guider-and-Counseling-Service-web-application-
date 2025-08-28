@@ -41,7 +41,7 @@ const Login = () => {
         FullName: user.FullName || decoded?.FullName,
       };
 
-      // ✅ Save token, role, and correct IDs in localStorage
+      // Save token, role, and correct IDs in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("role", finalUser.role);
 

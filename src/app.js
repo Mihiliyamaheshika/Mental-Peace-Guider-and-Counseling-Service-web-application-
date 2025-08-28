@@ -35,7 +35,7 @@ import CounselorBooked from './components/counselor/counselorbooked';
 const ProtectedRoute = ({ children, role }) => {
   const { user, loading } = useContext(AuthContext);
 
-  if (loading) return <div>Loading...</div>; // Wait for context to load
+  if (loading) return <div>Loading...</div>;
 
   if (!user) {
     // Not logged in
@@ -69,7 +69,7 @@ function App() {
           <Route path="/booking" element={<ProtectedRoute role="user"><Booking /></ProtectedRoute>} />
           <Route path="/appointments" element={<ProtectedRoute role="user"><Appointments /></ProtectedRoute>} />
           <Route path="/booked" element={<ProtectedRoute role="user"><Booked /></ProtectedRoute>} />
-           <Route path="/requested" element={<ProtectedRoute role="user"><Requested /></ProtectedRoute>} />
+          <Route path="/requested" element={<ProtectedRoute role="user"><Requested /></ProtectedRoute>} />
           <Route path="/cancelled" element={<ProtectedRoute role="user"><Cancelled /></ProtectedRoute>} />
           <Route path="/payment/:sessionId" element={<ProtectedRoute role="user"><Payment /></ProtectedRoute>} />
           <Route path="/paymentcancel" element={<ProtectedRoute role="user"><PaymentCancel /></ProtectedRoute>} />
@@ -77,11 +77,11 @@ function App() {
           <Route path="/paymentsuccess" element={<ProtectedRoute role="user"><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/progresstracker" element={<ProtectedRoute role="user"><ProgressTracker /></ProtectedRoute>} />
           <Route path="/chatbot" element={<ProtectedRoute role="user"><Chatbot /></ProtectedRoute>} />
-              <Route path="/counselor-profile/:id" element={<ProtectedRoute role="user"><CounselorProfilePage /></ProtectedRoute>} />
+          <Route path="/counselor-profile/:id" element={<ProtectedRoute role="user"><CounselorProfilePage /></ProtectedRoute>} />
           <Route path="/CounselorProfile" element={<ProtectedRoute role="user"><CounselorProfile /></ProtectedRoute>} />
           {/* Counselor Pages (Protected) */}
           <Route path="/counselor/booked" element={<ProtectedRoute role="counselor"><CounselorBooked /></ProtectedRoute>} />
-      
+
 
           {/* Life Tips & Other Resources (Public) */}
           <Route path="/lifetips" element={<Lifetips />} />

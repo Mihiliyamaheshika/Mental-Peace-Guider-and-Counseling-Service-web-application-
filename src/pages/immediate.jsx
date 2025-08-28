@@ -2,9 +2,18 @@ import React from "react";
 import { PhoneCall } from "lucide-react";
 
 const Immediate = () => {
-  const handleEmergencyCall = () => {
-    alert("Connecting you to an available counselor...");
-    // Optionally, trigger a real call: window.location.href = "tel:+94771234567";
+  // counselors' WhatsApp numbers 
+  const counselors = ["94775953096"];
+
+  const handleEmergencyChat = () => {
+    // Pick a random counselor from  list
+    const randomCounselor = counselors[Math.floor(Math.random() * counselors.length)];
+
+    // Opens WhatsApp Web / App 
+    window.open(
+      `https://wa.me/${randomCounselor}?text=I%20need%20urgent%20help`,
+      "_blank"
+    );
   };
 
   return (
@@ -14,15 +23,15 @@ const Immediate = () => {
           You're Not Alone. We're Here for You.
         </h1>
         <p className="text-center text-gray-700">
-          If you're feeling overwhelmed or in a crisis, please don’t wait. Tap the button below to immediately connect with an available counselor.
+          If you're feeling overwhelmed or in a crisis, please don’t wait. Tap the button below to immediately connect with an available counselor via WhatsApp.
         </p>
 
         <button
-          onClick={handleEmergencyCall}
+          onClick={handleEmergencyChat}
           className="bg-[#9D00FF] hover:bg-[#7A00CC] text-white px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-3 animate-pulse"
         >
           <PhoneCall className="w-6 h-6" />
-          <span>Call a Counselor Now</span>
+          <span>Chat with Counselor Now</span>
         </button>
 
         <p className="text-sm text-gray-500 text-center mt-4">

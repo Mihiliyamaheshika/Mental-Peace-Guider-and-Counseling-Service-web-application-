@@ -5,7 +5,7 @@ const Requested = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Get actual logged-in user ID from localStorage
+
   const loggedInUserID = localStorage.getItem("userId");
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const Requested = () => {
       }
 
       try {
-        // ✅ Call backend endpoint to get bookings for this user
+        //  Call backend endpoint to get bookings for user
         const res = await axios.get(
           `https://localhost:5001/api/BookingRequests/user/${loggedInUserID}`
         );
@@ -38,7 +38,7 @@ const Requested = () => {
   if (!sessions.length)
     return <div className="p-6 text-center text-gray-700">No requested sessions found.</div>;
 
-  // ✅ Format date in Sri Lanka timezone
+  // Format date in Sri Lanka timezone
   const formatDate = (dateStr) =>
     new Date(dateStr).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -64,7 +64,7 @@ const Requested = () => {
             <tr>
               <th className="px-6 py-2 text-left">Counselor Name</th>
               <th className="px-6 py-2 text-left">Date</th>
-              <th className="px-6 py-2 text-left">Time</th>
+              <th className="px-6 py-2 text-left">Start Time</th>
               <th className="px-6 py-2 text-left">Message</th>
               <th className="px-6 py-2 text-left">Status</th>
             </tr>

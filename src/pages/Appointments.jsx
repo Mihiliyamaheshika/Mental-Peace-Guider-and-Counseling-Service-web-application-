@@ -156,11 +156,10 @@ const AppointmentPage = () => {
 
                 <button
                   onClick={() => handleCounselorSelect(c)}
-                  className={`w-4 h-4 rounded ${
-                    selectedCounselor?.counselorID === c.counselorID
+                  className={`w-4 h-4 rounded ${selectedCounselor?.counselorID === c.counselorID
                       ? 'bg-green-500'
                       : 'bg-gray-300'
-                  } hover:bg-green-400 transition`}
+                    } hover:bg-green-400 transition`}
                   title={`Select ${c.fullName}`}
                 ></button>
                 <span className="text-xs">
@@ -280,6 +279,7 @@ const AppointmentPage = () => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 pt-3">
+
           {/* Updated Ready to book button */}
           <button
             onClick={() => {
@@ -302,8 +302,8 @@ const AppointmentPage = () => {
                 counselorId: selectedCounselor.counselorID,
                 counselorName: selectedCounselor.fullName,
                 date: selectedDate.toISOString(),
-                startTime: `${start.h.toString().padStart(2,'0')}:${start.m.toString().padStart(2,'0')}`,
-                endTime: `${end.h.toString().padStart(2,'0')}:${end.m.toString().padStart(2,'0')}`,
+                startTime: `${start.h.toString().padStart(2, '0')}:${start.m.toString().padStart(2, '0')}`,
+                endTime: `${end.h.toString().padStart(2, '0')}:${end.m.toString().padStart(2, '0')}`,
               };
 
               sessionStorage.setItem('pendingBooking', JSON.stringify(bookingPayload));

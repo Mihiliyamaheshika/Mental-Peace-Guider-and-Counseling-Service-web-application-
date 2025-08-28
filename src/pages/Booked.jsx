@@ -103,8 +103,8 @@ const Booked = () => {
                     <button
                       onClick={() => handlePayment(session.bookingID)}
                       className={`px-4 py-1 rounded-full text-xs shadow transition duration-150 ${session.isPaid
-                          ? 'bg-green-500 hover:bg-green-600 text-white'
-                          : 'bg-blue-500 hover:bg-blue-600 text-white'
+                        ? 'bg-green-500 hover:bg-green-600 text-white'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
                         }`}
                     >
                       {session.isPaid ? 'Paid' : 'Do payment'}
@@ -120,17 +120,13 @@ const Booked = () => {
                       }}
                       disabled={!session.isPaid}
                       className={`px-4 py-1 rounded-full text-xs shadow transition duration-150 ${session.isPaid
-                          ? 'bg-purple-500 hover:bg-purple-600 text-white'
-                          : 'bg-gray-300 text-gray-700 cursor-not-allowed'
+                        ? 'bg-purple-500 hover:bg-purple-600 text-white'
+                        : 'bg-gray-300 text-gray-700 cursor-not-allowed'
                         }`}
                     >
                       To Session
                     </button>
 
-
-                    <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-full text-xs shadow transition duration-150">
-                      Cancel
-                    </button>
                   </div>
                 </td>
               </tr>

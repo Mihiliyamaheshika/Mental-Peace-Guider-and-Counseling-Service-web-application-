@@ -4,7 +4,7 @@ import axios from "axios";
 
 const PaymentButton = () => {
   const [sdkReady, setSdkReady] = useState(false);
-  const { id } = useParams(); // booking id from /payment/:id
+  const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const PaymentButton = () => {
 
     if (status === "success" && orderId) {
       const userID = Number(localStorage.getItem("userId"));
-      const amount = 2500; // update if dynamic
+      const amount = 2500;
 
       axios
         .post("https://localhost:5001/api/Payments", {
@@ -61,7 +61,7 @@ const PaymentButton = () => {
         clearInterval(popupTick);
 
         try {
-          // Mark booking as paid (optional if PaymentSuccess page handles this)
+          // Mark booking as paid 
           await axios.put(
             `https://localhost:5001/api/Bookings/${id}/pay`,
             "Paid",

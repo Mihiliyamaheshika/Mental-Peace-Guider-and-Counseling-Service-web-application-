@@ -3,8 +3,8 @@ import API from "./API"; // Axios instance
 // Register new user
 export const register = async (data) => {
   try {
-    const response = await API.post("/auth/register", data); // Axios will prepend baseURL
-    return response.data; // return only data
+    const response = await API.post("/auth/register", data);
+    return response.data;
   } catch (error) {
     console.error("API register error:", error.response?.data || error.message);
     throw error.response?.data || error.message;

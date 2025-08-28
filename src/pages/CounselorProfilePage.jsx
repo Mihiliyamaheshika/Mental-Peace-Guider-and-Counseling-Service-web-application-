@@ -11,7 +11,7 @@ const CounselorProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Function to map backend data to our state structure
+  // Map backend data to state structure
   const mapCounselorData = (data) => ({
     id: data.counselorID || data.id,
     name: data.fullName || 'N/A',
@@ -26,12 +26,12 @@ const CounselorProfilePage = () => {
   });
 
   useEffect(() => {
-    // 1️⃣ Use state from navigation if available
+    // Use state from navigation if available
     if (location.state && location.state.counselor) {
       setCounselor(mapCounselorData(location.state.counselor));
       setLoading(false);
     }
-    // 2️⃣ Otherwise, fetch from backend
+    // Or else fetch from backend
     else if (id) {
       axios.get(`https://localhost:5001/api/Counselors/${id}`)
         .then(res => {
@@ -80,7 +80,7 @@ const CounselorProfilePage = () => {
         <p><strong>Email:</strong> {counselor.details.email}</p>
         <p><strong>Profile Name:</strong> {counselor.details.profileName}</p>
         <p><strong>Availability:</strong> {counselor.details.availability}</p>
-       
+
       </div>
 
       {/* Back Button */}
